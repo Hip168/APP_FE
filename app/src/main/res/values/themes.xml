@@ -1,0 +1,90 @@
+<resources>
+    <!-- Base Theme -->
+    <style name="Theme.BTCK" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/mint_primary</item>
+        <item name="colorPrimaryVariant">@color/mint_dark</item>
+        <item name="colorOnPrimary">@color/text_dark</item>
+        <item name="colorSecondary">@color/mint_accent</item>
+        <item name="colorOnSecondary">@color/text_white</item>
+        <item name="colorSurface">@color/surface</item>
+        <item name="colorOnSurface">@color/text_dark</item>
+        <item name="colorError">@color/color_owe</item>
+        <item name="android:colorBackground">@color/background_light</item>
+        <item name="android:statusBarColor">@color/background_white</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:navigationBarColor">@color/background_white</item>
+        <item name="android:fontFamily">@font/inter_regular</item>
+    </style>
+
+    <style name="Theme.BTCK.Splash" parent="Theme.BTCK">
+        <item name="android:statusBarColor">@color/mint_primary</item>
+        <item name="android:navigationBarColor">@color/mint_primary</item>
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
+
+    <!-- Card Style -->
+    <style name="CardStyle" parent="Widget.MaterialComponents.CardView">
+        <item name="cardCornerRadius">16dp</item>
+        <item name="cardElevation">4dp</item>
+        <item name="cardBackgroundColor">@color/background_card</item>
+        <item name="contentPaddingLeft">16dp</item>
+        <item name="contentPaddingRight">16dp</item>
+        <item name="contentPaddingTop">16dp</item>
+        <item name="contentPaddingBottom">16dp</item>
+    </style>
+
+    <!-- BalanceCard -->
+    <style name="BalanceCardStyle" parent="Widget.MaterialComponents.CardView">
+        <item name="cardCornerRadius">20dp</item>
+        <item name="cardElevation">8dp</item>
+        <item name="cardBackgroundColor">@color/mint_primary</item>
+    </style>
+
+    <!-- Primary Button -->
+    <style name="PrimaryButton" parent="Widget.MaterialComponents.Button">
+        <item name="android:minHeight">52dp</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/text_dark</item>
+        <item name="backgroundTint">@color/mint_primary</item>
+        <item name="cornerRadius">14dp</item>
+    </style>
+
+    <!-- OutlinedButton -->
+    <style name="OutlinedButton" parent="Widget.MaterialComponents.Button.OutlinedButton">
+        <item name="android:minHeight">48dp</item>
+        <item name="android:textColor">@color/mint_dark</item>
+        <item name="strokeColor">@color/mint_dark</item>
+        <item name="cornerRadius">12dp</item>
+    </style>
+
+    <!-- TextInputLayout -->
+    <style name="InputStyle" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <item name="boxCornerRadiusTopStart">12dp</item>
+        <item name="boxCornerRadiusTopEnd">12dp</item>
+        <item name="boxCornerRadiusBottomStart">12dp</item>
+        <item name="boxCornerRadiusBottomEnd">12dp</item>
+        <item name="boxStrokeColor">@color/mint_primary</item>
+        <item name="hintTextColor">@color/text_secondary</item>
+    </style>
+
+    <!-- App Title Text -->
+    <style name="TitleText">
+        <item name="android:textSize">22sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/text_dark</item>
+        <item name="android:fontFamily">@font/inter_bold</item>
+    </style>
+
+    <!-- Bottom Sheet -->
+    <style name="BottomSheetStyle" parent="Widget.MaterialComponents.BottomSheet.Modal">
+        <item name="shapeAppearanceOverlay">@style/BottomSheetShapeOverlay</item>
+    </style>
+
+    <style name="BottomSheetShapeOverlay" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSizeTopRight">20dp</item>
+        <item name="cornerSizeTopLeft">20dp</item>
+    </style>
+
+</resources>

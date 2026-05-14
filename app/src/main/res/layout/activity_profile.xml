@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background_light">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:elevation="0dp"
+        app:elevation="0dp">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/background_white"
+            app:titleTextColor="@color/text_dark" />
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- Avatar Header Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="6dp"
+                app:cardBackgroundColor="@color/mint_primary">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:padding="32dp">
+
+                    <!-- Avatar Circle -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="80dp"
+                        android:layout_height="80dp"
+                        app:cardCornerRadius="40dp"
+                        app:cardBackgroundColor="@color/background_white"
+                        app:cardElevation="4dp">
+
+                        <TextView
+                            android:id="@+id/tvAvatarInitial"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:text="A"
+                            android:textSize="32sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/mint_dark"
+                            android:gravity="center" />
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <TextView
+                        android:id="@+id/tvFullName"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Nguyễn Văn A"
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/text_dark"
+                        android:layout_marginTop="16dp" />
+
+                    <TextView
+                        android:id="@+id/tvEmail"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="user@email.com"
+                        android:textSize="14sp"
+                        android:textColor="@color/text_dark"
+                        android:alpha="0.7"
+                        android:layout_marginTop="4dp" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Edit Profile Button -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginBottom="12dp"
+                app:cardCornerRadius="14dp"
+                app:cardElevation="3dp"
+                app:cardBackgroundColor="@color/background_card">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="4dp">
+
+                    <Button
+                        android:id="@+id/btnEditProfile"
+                        android:layout_width="match_parent"
+                        android:layout_height="52dp"
+                        android:text="✏️  Chỉnh sửa hồ sơ"
+                        android:gravity="start|center_vertical"
+                        android:paddingStart="16dp"
+                        android:textColor="@color/text_dark"
+                        android:textSize="15sp"
+                        android:background="?attr/selectableItemBackground" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/background_light"
+                        android:layout_marginHorizontal="16dp" />
+
+                    <Button
+                        android:id="@+id/btnChangePassword"
+                        android:layout_width="match_parent"
+                        android:layout_height="52dp"
+                        android:text="🔐  Đổi mật khẩu"
+                        android:gravity="start|center_vertical"
+                        android:paddingStart="16dp"
+                        android:textColor="@color/text_dark"
+                        android:textSize="15sp"
+                        android:background="?attr/selectableItemBackground" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/background_light"
+                        android:layout_marginHorizontal="16dp" />
+
+                    <Button
+                        android:id="@+id/btnBankInfo"
+                        android:layout_width="match_parent"
+                        android:layout_height="52dp"
+                        android:text="🏦  Thông tin ngân hàng"
+                        android:gravity="start|center_vertical"
+                        android:paddingStart="16dp"
+                        android:textColor="@color/text_dark"
+                        android:textSize="15sp"
+                        android:background="?attr/selectableItemBackground" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/background_light"
+                        android:layout_marginHorizontal="16dp" />
+
+                    <Button
+                        android:id="@+id/btnShowQr"
+                        android:layout_width="match_parent"
+                        android:layout_height="52dp"
+                        android:text="📱  Xem mã QR của tôi"
+                        android:gravity="start|center_vertical"
+                        android:paddingStart="16dp"
+                        android:textColor="@color/mint_dark"
+                        android:textSize="15sp"
+                        android:textStyle="bold"
+                        android:background="?attr/selectableItemBackground" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Logout Button -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnLogout"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginBottom="32dp"
+                android:text="Đăng xuất"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                app:backgroundTint="@color/color_owe"
+                app:cornerRadius="14dp"
+                style="@style/Widget.MaterialComponents.Button" />
+
+        </LinearLayout>
+    </ScrollView>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -1,0 +1,25 @@
+<resources>
+    <string name="app_name">SplitMate</string>
+    <string name="login">Đăng nhập</string>
+    <string name="register">Đăng ký</string>
+    <string name="email">Email</string>
+    <string name="password">Mật khẩu</string>
+    <string name="full_name">Họ và tên</string>
+    <string name="groups">Nhóm</string>
+    <string name="expenses">Chi tiêu</string>
+    <string name="settlements">Thanh toán</string>
+    <string name="notifications">Thông báo</string>
+    <string name="profile">Cá nhân</string>
+    <string name="home">Trang chủ</string>
+    <string name="add_expense">Thêm chi tiêu</string>
+    <string name="create_group">Tạo nhóm</string>
+    <string name="loading">Đang tải...</string>
+    <string name="no_data">Chưa có dữ liệu</string>
+    <string name="error_network">Lỗi kết nối mạng</string>
+    <string name="retry">Thử lại</string>
+    <string name="logout">Đăng xuất</string>
+    <string name="settle_up">Thanh toán</string>
+    <string name="you_owe">Bạn nợ</string>
+    <string name="owed_to_you">Người khác nợ bạn</string>
+    <string name="balanced">Đã cân bằng</string>
+</resources>

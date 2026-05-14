@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:paddingVertical="8dp">
+
+    <CheckBox
+        android:id="@+id/cbMember"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:checked="true"
+        android:buttonTint="@color/mint_dark"/>
+
+    <LinearLayout
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:layout_marginStart="8dp"
+        android:background="@drawable/bg_mint_circle"
+        android:gravity="center">
+        <TextView
+            android:id="@+id/tvInitial"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="A"
+            android:textColor="@color/text_dark"
+            android:textSize="14sp"
+            android:textStyle="bold"/>
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/tvMemberName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_marginStart="10dp"
+        android:text="Member"
+        android:textColor="@color/text_dark"
+        android:textSize="14sp"
+        android:maxLines="1"
+        android:ellipsize="end"/>
+
+    <com.google.android.material.textfield.TextInputLayout
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        app:boxCornerRadiusTopStart="8dp" app:boxCornerRadiusTopEnd="8dp"
+        app:boxCornerRadiusBottomStart="8dp" app:boxCornerRadiusBottomEnd="8dp"
+        app:boxStrokeColor="@color/mint_primary"
+        app:suffixText="đ">
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etAmount"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="number"
+            android:textSize="13sp"
+            android:textColor="@color/text_dark"
+            android:hint="0"/>
+    </com.google.android.material.textfield.TextInputLayout>
+
+</LinearLayout>

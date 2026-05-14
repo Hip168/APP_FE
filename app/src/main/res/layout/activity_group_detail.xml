@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background_light"
+    android:orientation="vertical">
+
+    <!-- Toolbar -->
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/background_white"
+        app:elevation="4dp">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/background_white"
+            app:titleTextColor="@color/text_dark"
+            app:navigationIconTint="@color/text_dark"/>
+
+        <!-- Stats Bar -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="20dp"
+            android:paddingBottom="12dp"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Tổng chi"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="12sp"/>
+                <TextView
+                    android:id="@+id/tvTotalSpent"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0đ"
+                    android:textColor="@color/text_dark"
+                    android:textSize="16sp"
+                    android:textStyle="bold"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Số dư của bạn"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="12sp"/>
+                <TextView
+                    android:id="@+id/tvYourBalance"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0đ"
+                    android:textColor="@color/color_owed"
+                    android:textSize="16sp"
+                    android:textStyle="bold"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Thành viên"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="12sp"/>
+                <TextView
+                    android:id="@+id/tvMemberCount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0"
+                    android:textColor="@color/text_dark"
+                    android:textSize="16sp"
+                    android:textStyle="bold"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Chi tiêu"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="12sp"/>
+                <TextView
+                    android:id="@+id/tvExpenseCount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0"
+                    android:textColor="@color/text_dark"
+                    android:textSize="16sp"
+                    android:textStyle="bold"/>
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- TabLayout -->
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/tabLayout"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:background="@color/background_white"
+            app:tabSelectedTextColor="@color/mint_dark"
+            app:tabTextColor="@color/text_secondary"
+            app:tabIndicatorColor="@color/mint_dark"
+            app:tabIndicatorHeight="3dp"
+            app:tabMode="fixed"/>
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <!-- Content -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <!-- Expenses Tab -->
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvExpenses"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:padding="12dp"
+                android:clipToPadding="false"
+                android:overScrollMode="never"/>
+
+            <LinearLayout
+                android:id="@+id/layoutEmpty"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:visibility="gone">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="💸" android:textSize="64sp"/>
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="Chưa có chi tiêu"
+                    android:textColor="@color/text_dark" android:textSize="18sp" android:textStyle="bold"/>
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Nhấn + để thêm chi tiêu đầu tiên"
+                    android:textColor="@color/text_secondary" android:textSize="14sp"/>
+            </LinearLayout>
+        </FrameLayout>
+
+        <!-- Balance Tab -->
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/layoutBalance"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone"
+            android:padding="20dp">
+            <TextView
+                android:id="@+id/tvBalanceDetail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Đang tải..."
+                android:textColor="@color/text_dark"
+                android:textSize="15sp"
+                android:lineSpacingExtra="8dp"/>
+        </androidx.core.widget.NestedScrollView>
+
+        <!-- Simplified Tab -->
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/layoutSimplified"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone"
+            android:padding="20dp">
+            <TextView
+                android:id="@+id/tvSimplifiedDetail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Đang tải..."
+                android:textColor="@color/text_dark"
+                android:textSize="15sp"
+                android:lineSpacingExtra="8dp"/>
+        </androidx.core.widget.NestedScrollView>
+
+    </FrameLayout>
+</LinearLayout>

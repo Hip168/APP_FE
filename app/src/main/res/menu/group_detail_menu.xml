@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/action_add_expense"
+        android:title="Thêm chi tiêu"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_add_member"
+        android:title="Thêm thành viên"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_invite"
+        android:title="Tạo mã mời"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_settle"
+        android:title="Ghi nhận thanh toán"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_info"
+        android:title="Thông tin nhóm"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_leave"
+        android:title="Rời nhóm"
+        app:showAsAction="never" />
+</menu>

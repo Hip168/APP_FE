@@ -1,0 +1,25 @@
+# Built variants
+**/build
+*.apk
+*.aar
+
+# Android Studio
+.idea/
+.gradle/
+local.properties
+captures/
+externalNativeBuild/
+.cxx/
+*.iml
+.DS_Store
+
+# Log files
+*.log
+
+# Keystores
+*.jks
+*.p12
+*.keystore
+
+# Google Services
+google-services.json

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Brand Colors -->
+    <color name="mint_primary">#B8F2E6</color>
+    <color name="mint_dark">#52D9C1</color>
+    <color name="mint_light">#E8FDF8</color>
+    <color name="mint_accent">#00C9A7</color>
+
+    <!-- Backgrounds -->
+    <color name="background_white">#FFFFFF</color>
+    <color name="background_light">#F8FFFE</color>
+    <color name="background_card">#FFFFFF</color>
+    <color name="surface">#FFFFFF</color>
+
+    <!-- Text -->
+    <color name="text_dark">#1A1A2E</color>
+    <color name="text_primary">#2D3436</color>
+    <color name="text_secondary">#636E72</color>
+    <color name="text_hint">#A0A0A0</color>
+    <color name="text_white">#FFFFFF</color>
+
+    <!-- Status Colors -->
+    <color name="color_owe">#FF6B6B</color>
+    <color name="color_owed">#00B894</color>
+    <color name="color_settled">#B2BEC3</color>
+    <color name="color_warning">#FDCB6E</color>
+
+    <!-- UI -->
+    <color name="divider">#F0F0F0</color>
+    <color name="bottom_nav_selected">#00C9A7</color>
+    <color name="bottom_nav_unselected">#B2BEC3</color>
+    <color name="shadow">#1A000000</color>
+    <color name="ripple">#20B8F2E6</color>
+
+    <!-- Material -->
+    <color name="colorPrimary">#B8F2E6</color>
+    <color name="colorPrimaryVariant">#52D9C1</color>
+    <color name="colorOnPrimary">#1A1A2E</color>
+    <color name="colorSecondary">#00C9A7</color>
+    <color name="colorOnSecondary">#FFFFFF</color>
+    <color name="colorSurface">#FFFFFF</color>
+    <color name="colorOnSurface">#1A1A2E</color>
+    <color name="colorError">#FF6B6B</color>
+    <color name="colorOnError">#FFFFFF</color>
+    <color name="colorBackground">#F8FFFE</color>
+    <color name="colorOnBackground">#1A1A2E</color>
+
+    <!-- Category Colors -->
+    <color name="cat_food">#FF9F43</color>
+    <color name="cat_transport">#48DBFB</color>
+    <color name="cat_entertainment">#FF6B9D</color>
+    <color name="cat_shopping">#A29BFE</color>
+    <color name="cat_accommodation">#55EFC4</color>
+    <color name="cat_other">#DFE6E9</color>
+</resources>
