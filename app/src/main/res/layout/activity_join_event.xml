@@ -49,7 +49,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Nhập mã mời 8 ký tự do người tạo nhóm cung cấp"
+            android:text="Nhập mã mời do người tạo nhóm cung cấp"
             android:textSize="15sp"
             android:textColor="@color/text_secondary"
             android:gravity="center"
@@ -60,7 +60,7 @@
             android:id="@+id/tilCode"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Mã mời (8 ký tự)"
+            android:hint="Mã mời hoặc link mời"
             android:layout_marginBottom="24dp"
             style="@style/InputStyle">
 
@@ -68,9 +68,8 @@
                 android:id="@+id/etCode"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="textCapCharacters"
-                android:maxLength="8"
-                android:letterSpacing="0.3"
+                android:inputType="textCapCharacters|textNoSuggestions"
+                android:letterSpacing="0.15"
                 android:gravity="center"
                 android:textSize="22sp"
                 android:textStyle="bold"

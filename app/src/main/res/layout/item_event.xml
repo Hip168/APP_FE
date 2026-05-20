@@ -94,6 +94,18 @@
                     android:textColor="@color/text_secondary"
                     android:textSize="12sp"/>
             </LinearLayout>
+
+            <TextView
+                android:id="@+id/tvBalanceHint"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Đã cân bằng"
+                android:textColor="@color/text_secondary"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:maxLines="2"
+                android:ellipsize="end"/>
         </LinearLayout>
 
         <!-- Arrow -->

@@ -62,7 +62,8 @@
                 android:id="@+id/rvNotifications"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:paddingVertical="8dp"
+                android:paddingTop="12dp"
+                android:paddingBottom="96dp"
                 android:clipToPadding="false"
                 android:overScrollMode="never"/>
 

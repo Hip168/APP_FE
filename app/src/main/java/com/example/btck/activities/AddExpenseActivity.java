@@ -1,21 +1,38 @@
 package com.example.btck.activities;
 
 import android.app.DatePickerDialog;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Toast;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import com.example.btck.adapters.MemberSplitAdapter;
+import com.example.btck.api.RetrofitClient;
 import com.example.btck.databinding.ActivityAddExpenseBinding;
 import com.example.btck.managers.TokenManager;
 import com.example.btck.models.*;
 import com.example.btck.viewmodel.EventViewModel;
 import com.example.btck.viewmodel.ExpenseViewModel;
+import java.io.File;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
 
 public class AddExpenseActivity extends AppCompatActivity {
 
@@ -29,6 +46,36 @@ public class AddExpenseActivity extends AppCompatActivity {
     private String currentUserId;
     private String selectedDate;
     private String selectedCategory = "other";
+
+    // Camera / Gallery
+    private Uri photoUri = null;
+    private File photoFile = null;
+    private String createdExpenseId = null; // lưu lại để upload ảnh sau khi tạo expense xong
+
+    private final ActivityResultLauncher<Uri> cameraLauncher =
+            registerForActivityResult(new ActivityResultContracts.TakePicture(), success -> {
+                if (success && photoFile != null) {
+                    binding.ivReceiptPreview.setImageURI(photoUri);
+                    binding.ivReceiptPreview.setVisibility(View.VISIBLE);
+                    Toast.makeText(this, "✅ Đã chụp ảnh hoá đơn", Toast.LENGTH_SHORT).show();
+                }
+            });
+
+    private final ActivityResultLauncher<String> galleryLauncher =
+            registerForActivityResult(new ActivityResultContracts.GetContent(), uri -> {
+                if (uri != null) {
+                    photoUri = uri;
+                    photoFile = null; // gallery file handled differently
+                    binding.ivReceiptPreview.setImageURI(uri);
+                    binding.ivReceiptPreview.setVisibility(View.VISIBLE);
+                }
+            });
+
+    private final ActivityResultLauncher<String> requestCameraPermission =
+            registerForActivityResult(new ActivityResultContracts.RequestPermission(), granted -> {
+                if (granted) launchCamera();
+                else Toast.makeText(this, "Cần quyền Camera để chụp ảnh", Toast.LENGTH_SHORT).show();
+            });
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +95,8 @@ public class AddExpenseActivity extends AppCompatActivity {
         setupDatePicker();
         setupCategoryChips();
         setupSplitRecyclerView();
+        setupCameraButton();
+        setupSaveActions();
         observeData();
         loadMembers();
     }
@@ -97,11 +146,28 @@ public class AddExpenseActivity extends AppCompatActivity {
 
     private void setupSplitRecyclerView() {
         splitAdapter = new MemberSplitAdapter(splitItems);
+        splitAdapter.setOnSplitChangedListener(this::recalculateSplits);
         binding.rvSplits.setLayoutManager(new LinearLayoutManager(this));
         binding.rvSplits.setAdapter(splitAdapter);
         binding.rvSplits.setNestedScrollingEnabled(false);
 
-        binding.rgSplitMethod.setOnCheckedChangeListener((group, checkedId) -> recalculateSplits());
+        binding.rgSplitMethod.setOnCheckedChangeListener((group, checkedId) -> {
+            splitAdapter.setEqualSplitMode(checkedId == com.example.btck.R.id.rbEqual);
+            recalculateSplits();
+        });
+
+        binding.etAmount.addTextChangedListener(new TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
+            @Override public void afterTextChanged(Editable s) {
+                binding.tilAmount.setError(null);
+                recalculateSplits();
+            }
+        });
+    }
+
+    private void setupSaveActions() {
+        binding.btnSave.setOnClickListener(v -> saveExpense());
     }
 
     private void loadMembers() {
@@ -138,9 +204,16 @@ public class AddExpenseActivity extends AppCompatActivity {
 
         expenseViewModel.createdExpense.observe(this, expense -> {
             if (expense != null) {
-                Toast.makeText(this, "Thêm chi tiêu thành công!", Toast.LENGTH_SHORT).show();
-                setResult(RESULT_OK);
-                finish();
+                createdExpenseId = expense.id;
+                // Nếu có ảnh, upload lên server
+                if (photoUri != null) {
+                    uploadReceiptImage(expense.id);
+                } else {
+                    binding.progressBar.setVisibility(View.GONE);
+                    Toast.makeText(this, "Thêm chi tiêu thành công!", Toast.LENGTH_SHORT).show();
+                    setResult(RESULT_OK);
+                    finish();
+                }
             }
         });
 
@@ -151,6 +224,102 @@ public class AddExpenseActivity extends AppCompatActivity {
                 Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
             }
         });
+    }
+
+    // ── Camera & Gallery ────────────────────────────────────────────────────────
+    private void setupCameraButton() {
+        if (binding.btnCamera == null) return; // chỉ chạy nếu layout có nút
+        binding.btnCamera.setOnClickListener(v -> showImageOptions());
+    }
+
+    private void showImageOptions() {
+        new com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
+                .setTitle("📷 Chụp ảnh hoá đơn")
+                .setItems(new String[]{"Dùng Camera", "Chọn từ Thư viện"}, (dialog, which) -> {
+                    if (which == 0) {
+                        // Camera
+                        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.CAMERA)
+                                == PackageManager.PERMISSION_GRANTED) {
+                            launchCamera();
+                        } else {
+                            requestCameraPermission.launch(android.Manifest.permission.CAMERA);
+                        }
+                    } else {
+                        // Gallery
+                        galleryLauncher.launch("image/*");
+                    }
+                })
+                .show();
+    }
+
+    private void launchCamera() {
+        try {
+            photoFile = File.createTempFile(
+                    "receipt_" + System.currentTimeMillis(),
+                    ".jpg",
+                    getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+            );
+            photoUri = FileProvider.getUriForFile(
+                    this,
+                    getPackageName() + ".provider",
+                    photoFile
+            );
+            cameraLauncher.launch(photoUri);
+        } catch (IOException e) {
+            Toast.makeText(this, "Không tạo được file ảnh", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void uploadReceiptImage(String expenseId) {
+        try {
+            File fileToUpload;
+            if (photoFile != null && photoFile.exists()) {
+                fileToUpload = photoFile;
+            } else {
+                // Gallery URI → copy to temp file
+                fileToUpload = File.createTempFile("receipt_upload", ".jpg",
+                        getExternalFilesDir(Environment.DIRECTORY_PICTURES));
+                try (java.io.InputStream in = getContentResolver().openInputStream(photoUri);
+                     java.io.OutputStream out = new java.io.FileOutputStream(fileToUpload)) {
+                    if (in != null) {
+                        byte[] buf = new byte[4096];
+                        int len;
+                        while ((len = in.read(buf)) > 0) out.write(buf, 0, len);
+                    }
+                }
+            }
+
+            RequestBody reqBody = RequestBody.create(fileToUpload, MediaType.parse("image/jpeg"));
+            MultipartBody.Part part = MultipartBody.Part.createFormData("file", fileToUpload.getName(), reqBody);
+
+            RetrofitClient.getApiService()
+                    .uploadExpenseImage(eventId, expenseId, part)
+                    .enqueue(new retrofit2.Callback<ExpensePublic>() {
+                        @Override
+                        public void onResponse(retrofit2.Call<ExpensePublic> call,
+                                               retrofit2.Response<ExpensePublic> response) {
+                            binding.progressBar.setVisibility(View.GONE);
+                            Toast.makeText(AddExpenseActivity.this,
+                                    "Thêm chi tiêu và ảnh thành công!", Toast.LENGTH_SHORT).show();
+                            setResult(RESULT_OK);
+                            finish();
+                        }
+                        @Override
+                        public void onFailure(retrofit2.Call<ExpensePublic> call, Throwable t) {
+                            binding.progressBar.setVisibility(View.GONE);
+                            // Expense đã tạo xong, chỉ upload ảnh thất bại
+                            Toast.makeText(AddExpenseActivity.this,
+                                    "Chi tiêu đã lưu, nhưng upload ảnh thất bại", Toast.LENGTH_SHORT).show();
+                            setResult(RESULT_OK);
+                            finish();
+                        }
+                    });
+        } catch (IOException e) {
+            binding.progressBar.setVisibility(View.GONE);
+            Toast.makeText(this, "Lỗi xử lý ảnh", Toast.LENGTH_SHORT).show();
+            setResult(RESULT_OK);
+            finish();
+        }
     }
 
     private void setupPayerSpinner() {
@@ -171,8 +340,17 @@ public class AddExpenseActivity extends AppCompatActivity {
     }
 
     private void recalculateSplits() {
+        if (binding.rbCustom.isChecked()) {
+            splitAdapter.notifyDataSetChanged();
+            return;
+        }
+
         String amountStr = binding.etAmount.getText().toString().trim();
-        if (TextUtils.isEmpty(amountStr)) return;
+        if (TextUtils.isEmpty(amountStr)) {
+            for (MemberSplitAdapter.SplitItem item : splitItems) item.amountOwed = 0;
+            splitAdapter.notifyDataSetChanged();
+            return;
+        }
         long total;
         try { total = Long.parseLong(amountStr.replace(",", "").replace(".", "")); }
         catch (NumberFormatException e) { return; }
@@ -180,6 +358,7 @@ public class AddExpenseActivity extends AppCompatActivity {
         List<MemberSplitAdapter.SplitItem> selected = new ArrayList<>();
         for (MemberSplitAdapter.SplitItem item : splitItems) {
             if (item.isSelected) selected.add(item);
+            else item.amountOwed = 0;
         }
         if (selected.isEmpty()) return;
 

@@ -5,17 +5,19 @@
     android:id="@+id/card"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginHorizontal="12dp"
-    android:layout_marginVertical="4dp"
-    app:cardCornerRadius="14dp"
-    app:cardElevation="2dp"
+    android:layout_marginHorizontal="16dp"
+    android:layout_marginVertical="6dp"
+    android:clickable="true"
+    android:focusable="true"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="1dp"
     app:cardBackgroundColor="@color/background_card">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:padding="14dp"
+        android:padding="16dp"
         android:gravity="center_vertical">
 
         <TextView
@@ -25,7 +27,7 @@
             android:background="@drawable/bg_mint_circle_light"
             android:gravity="center"
             android:text="🔔"
-            android:textSize="20sp"/>
+            android:textSize="18sp"/>
 
         <LinearLayout
             android:layout_width="0dp"
@@ -42,7 +44,7 @@
                 android:textColor="@color/text_dark"
                 android:textSize="14sp"
                 android:textStyle="bold"
-                android:maxLines="1"
+                android:maxLines="2"
                 android:ellipsize="end"/>
 
             <TextView
@@ -53,7 +55,7 @@
                 android:text="Nội dung thông báo"
                 android:textColor="@color/text_secondary"
                 android:textSize="13sp"
-                android:maxLines="2"
+                android:maxLines="3"
                 android:ellipsize="end"/>
 
             <TextView

@@ -13,6 +13,8 @@ public class SimplifiedDebt {
     public String toUserId;
     @SerializedName("to_user_email")
     public String toUserEmail;
+    @SerializedName("to_user_full_name")
+    public String toUserFullName;
     @SerializedName("to_user_full")
     public String toUserFull;
     @SerializedName("amount")
@@ -25,6 +27,7 @@ public class SimplifiedDebt {
     }
 
     public String getToDisplayName() {
+        if (toUserFullName != null && !toUserFullName.isEmpty()) return toUserFullName;
         if (toUserFull != null && !toUserFull.isEmpty()) return toUserFull;
         if (toUserEmail != null) return toUserEmail.split("@")[0];
         return "Unknown";

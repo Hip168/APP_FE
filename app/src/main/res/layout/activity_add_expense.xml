@@ -192,6 +192,37 @@
                 android:layout_marginBottom="16dp"
                 android:overScrollMode="never"/>
 
+            <!-- Camera / Receipt Image -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:text="Ảnh hoá đơn (tuỳ chọn)"
+                android:textColor="@color/text_dark"
+                android:textSize="15sp"
+                android:textStyle="bold"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnCamera"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginBottom="12dp"
+                android:text="📷  Chụp / Chọn ảnh hoá đơn"
+                android:textColor="@color/mint_dark"
+                app:strokeColor="@color/mint_primary"
+                app:cornerRadius="12dp"/>
+
+            <ImageView
+                android:id="@+id/ivReceiptPreview"
+                android:layout_width="match_parent"
+                android:layout_height="160dp"
+                android:layout_marginBottom="16dp"
+                android:scaleType="centerCrop"
+                android:adjustViewBounds="true"
+                android:background="@drawable/shimmer_placeholder"
+                android:visibility="gone"/>
+
             <!-- Save Button -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnSave"
@@ -212,6 +243,7 @@
                 android:layout_gravity="center"
                 android:layout_marginTop="12dp"
                 android:visibility="gone"/>
+
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>

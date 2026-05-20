@@ -269,4 +269,15 @@ Push Notify      → Firebase Cloud Messaging (FCM)
 
 ---
 
-*Cập nhật lần cuối: 2026-05-14 18:50*
+## 🛠️ Các cập nhật & Sửa lỗi gần đây (2026-05-16)
+
+| Chức năng / Lỗi | Trạng thái | Chi tiết |
+|-----------------|------------|----------|
+| **Lỗi Crash App (Toast Spam)** | ✅ Đã sửa | Xóa bỏ các `observeForever` gây rò rỉ bộ nhớ (memory leak) trong các `ViewModel` khiến app bị crash và lặp thông báo liên tục. |
+| **Join nhóm bằng mã mời** | ✅ Đã sửa | Hiển thị chính xác thông báo lỗi từ Backend (Mã hết hạn, Đã là thành viên) thay vì báo chung chung. Fix logic share mã mời có đính kèm thời gian hết hạn (24h). |
+| **Cập nhật Ngân hàng** | ✅ Đã sửa | Triển khai UI và logic lưu thông tin Ngân hàng vào `ProfileFragment`. Fix lỗi lưu sai ngân hàng khi sử dụng AutoCompleteTextView có bộ lọc (filter). |
+| **Chụp ảnh Hóa đơn** | ✅ Đã thêm | Tích hợp Camera & Gallery thông qua `FileProvider` vào màn hình `AddExpenseActivity` để người dùng có thể tải lên ảnh biên lai sau khi tạo chi tiêu. |
+
+---
+
+*Cập nhật lần cuối: 2026-05-16 09:15*

@@ -30,8 +30,6 @@ public class AuthViewModel extends AndroidViewModel {
     public void login(String email, String password) {
         isLoading.setValue(true);
         repository.login(email, password, loginResult, errorMessage);
-        loginResult.observeForever(token -> isLoading.setValue(false));
-        errorMessage.observeForever(err -> isLoading.setValue(false));
     }
 
     public void register(String email, String password, String fullName) {

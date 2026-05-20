@@ -173,14 +173,22 @@
             android:layout_height="match_parent"
             android:visibility="gone"
             android:padding="20dp">
-            <TextView
-                android:id="@+id/tvBalanceDetail"
+
+            <LinearLayout
+                android:id="@+id/layoutBalanceContent"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Đang tải..."
-                android:textColor="@color/text_dark"
-                android:textSize="15sp"
-                android:lineSpacingExtra="8dp"/>
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tvBalanceDetail"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Đang tải..."
+                    android:textColor="@color/text_dark"
+                    android:textSize="15sp"
+                    android:lineSpacingExtra="8dp"/>
+            </LinearLayout>
         </androidx.core.widget.NestedScrollView>
 
         <!-- Simplified Tab -->
@@ -190,14 +198,22 @@
             android:layout_height="match_parent"
             android:visibility="gone"
             android:padding="20dp">
-            <TextView
-                android:id="@+id/tvSimplifiedDetail"
+
+            <LinearLayout
+                android:id="@+id/layoutSimplifiedContent"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Đang tải..."
-                android:textColor="@color/text_dark"
-                android:textSize="15sp"
-                android:lineSpacingExtra="8dp"/>
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tvSimplifiedDetail"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Đang tải..."
+                    android:textColor="@color/text_dark"
+                    android:textSize="15sp"
+                    android:lineSpacingExtra="8dp"/>
+            </LinearLayout>
         </androidx.core.widget.NestedScrollView>
 
     </FrameLayout>

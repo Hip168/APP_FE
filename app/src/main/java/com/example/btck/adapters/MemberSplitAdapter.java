@@ -17,6 +17,12 @@ import java.util.List;
 public class MemberSplitAdapter extends RecyclerView.Adapter<MemberSplitAdapter.SplitViewHolder> {
 
     private final List<SplitItem> items;
+    private OnSplitChangedListener listener;
+    private boolean equalSplitMode = true;
+
+    public interface OnSplitChangedListener {
+        void onSplitChanged();
+    }
 
     public static class SplitItem {
         public EventMemberPublic member;
@@ -26,6 +32,15 @@ public class MemberSplitAdapter extends RecyclerView.Adapter<MemberSplitAdapter.
 
     public MemberSplitAdapter(List<SplitItem> items) {
         this.items = items;
+    }
+
+    public void setOnSplitChangedListener(OnSplitChangedListener listener) {
+        this.listener = listener;
+    }
+
+    public void setEqualSplitMode(boolean equalSplitMode) {
+        this.equalSplitMode = equalSplitMode;
+        notifyDataSetChanged();
     }
 
     @NonNull
@@ -39,7 +54,7 @@ public class MemberSplitAdapter extends RecyclerView.Adapter<MemberSplitAdapter.
     @Override
     public void onBindViewHolder(@NonNull SplitViewHolder holder, int position) {
         SplitItem item = items.get(position);
-        holder.bind(item);
+        holder.bind(item, equalSplitMode, listener);
     }
 
     @Override
@@ -58,27 +73,43 @@ public class MemberSplitAdapter extends RecyclerView.Adapter<MemberSplitAdapter.
             etAmount = itemView.findViewById(R.id.etAmount);
         }
 
-        void bind(SplitItem item) {
+        void bind(SplitItem item, boolean equalSplitMode, OnSplitChangedListener listener) {
+            cbMember.setOnCheckedChangeListener(null);
+            if (etAmount.getTag() instanceof TextWatcher) {
+                etAmount.removeTextChangedListener((TextWatcher) etAmount.getTag());
+            }
+
             tvMemberName.setText(item.member.getDisplayName());
             tvInitial.setText(item.member.getInitials());
             cbMember.setChecked(item.isSelected);
             etAmount.setText(item.amountOwed > 0 ? String.valueOf(item.amountOwed) : "");
-            etAmount.setEnabled(item.isSelected);
+            etAmount.setEnabled(item.isSelected && !equalSplitMode);
+            etAmount.setFocusable(item.isSelected && !equalSplitMode);
+            etAmount.setFocusableInTouchMode(item.isSelected && !equalSplitMode);
 
             cbMember.setOnCheckedChangeListener((buttonView, isChecked) -> {
                 item.isSelected = isChecked;
-                etAmount.setEnabled(isChecked);
-                if (!isChecked) { item.amountOwed = 0; etAmount.setText(""); }
+                etAmount.setEnabled(isChecked && !equalSplitMode);
+                etAmount.setFocusable(isChecked && !equalSplitMode);
+                etAmount.setFocusableInTouchMode(isChecked && !equalSplitMode);
+                if (!isChecked) {
+                    item.amountOwed = 0;
+                    etAmount.setText("");
+                }
+                if (listener != null) listener.onSplitChanged();
             });
 
-            etAmount.addTextChangedListener(new TextWatcher() {
+            TextWatcher watcher = new TextWatcher() {
                 @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
                 @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
                 @Override public void afterTextChanged(Editable s) {
+                    if (equalSplitMode) return;
                     try { item.amountOwed = Long.parseLong(s.toString()); }
                     catch (NumberFormatException e) { item.amountOwed = 0; }
                 }
-            });
+            };
+            etAmount.addTextChangedListener(watcher);
+            etAmount.setTag(watcher);
         }
     }
 }

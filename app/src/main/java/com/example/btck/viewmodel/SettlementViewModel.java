@@ -5,6 +5,7 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
 import com.example.btck.models.*;
 import com.example.btck.repository.SettlementRepository;
+import java.util.UUID;
 
 public class SettlementViewModel extends AndroidViewModel {
 
@@ -23,11 +24,16 @@ public class SettlementViewModel extends AndroidViewModel {
     public void loadSettlements(String eventId) {
         isLoading.setValue(true);
         repository.getSettlements(eventId, 0, 100, settlements, errorMessage);
-        settlements.observeForever(s -> isLoading.setValue(false));
     }
 
     public void createSettlement(String eventId, String fromUserId, String toUserId, long amount, String note) {
+        if (amount <= 0 || amount > Integer.MAX_VALUE) {
+            errorMessage.setValue("Số tiền thanh toán không hợp lệ. Vui lòng tải lại hoặc thử nhóm khác.");
+            isLoading.setValue(false);
+            return;
+        }
         isLoading.setValue(true);
-        repository.createSettlement(eventId, new SettlementCreate(fromUserId, toUserId, amount, note), createdSettlement, errorMessage);
+        String idempotencyKey = UUID.randomUUID().toString();
+        repository.createSettlement(eventId, new SettlementCreate(fromUserId, toUserId, amount, note, idempotencyKey), createdSettlement, errorMessage);
     }
 }

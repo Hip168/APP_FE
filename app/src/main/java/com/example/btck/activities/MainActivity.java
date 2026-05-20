@@ -13,7 +13,6 @@ import com.example.btck.fragments.GroupsFragment;
 import com.example.btck.fragments.NotificationsFragment;
 import com.example.btck.fragments.ProfileFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -27,7 +26,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
 
         setupBottomNavigation();
-        setupFab();
 
         // Show home by default
         if (savedInstanceState == null) {
@@ -53,18 +51,6 @@ public class MainActivity extends AppCompatActivity {
             }
             return false;
         });
-    }
-
-    private void setupFab() {
-        binding.fabAddExpense.setOnClickListener(v -> {
-            // Open add expense - require event selection first
-            showAddExpenseMenu();
-        });
-    }
-
-    private void showAddExpenseMenu() {
-        // Go to groups screen to select an event
-        binding.bottomNav.setSelectedItemId(R.id.nav_groups);
     }
 
     private void loadFragment(Fragment fragment) {

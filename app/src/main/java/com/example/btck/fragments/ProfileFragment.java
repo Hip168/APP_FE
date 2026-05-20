@@ -25,6 +25,9 @@ public class ProfileFragment extends Fragment {
     private AuthViewModel authViewModel;
     private TokenManager tokenManager;
     private UserRepository userRepository;
+    private UserPublic currentUser;
+    private java.util.List<com.example.btck.models.BankInfo> bankList = new java.util.ArrayList<>();
+    private com.example.btck.models.BankInfo selectedBankInfo = null;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -58,6 +61,19 @@ public class ProfileFragment extends Fragment {
                     : String.valueOf(name.charAt(0)).toUpperCase();
             binding.tvAvatarInitial.setText(initials);
         }
+
+        authViewModel.currentUser.observe(getViewLifecycleOwner(), user -> {
+            if (user != null) {
+                currentUser = user;
+                binding.tvUserName.setText(user.getDisplayName());
+                binding.tvUserEmail.setText(user.email != null ? user.email : "");
+                if (user.getDisplayName() != null && !user.getDisplayName().isEmpty()) {
+                    binding.tvAvatarInitial.setText(
+                            String.valueOf(user.getDisplayName().charAt(0)).toUpperCase());
+                }
+            }
+        });
+        authViewModel.fetchCurrentUser();
     }
 
     private void setupClickListeners() {
@@ -147,7 +163,109 @@ public class ProfileFragment extends Fragment {
     }
 
     private void showBankInfoDialog() {
-        Toast.makeText(requireContext(), "Tính năng đang phát triển", Toast.LENGTH_SHORT).show();
+        View dialogView = LayoutInflater.from(requireContext()).inflate(com.example.btck.R.layout.dialog_bank_info, null);
+        android.widget.AutoCompleteTextView spinnerBank  = dialogView.findViewById(com.example.btck.R.id.spinnerBank);
+        com.google.android.material.textfield.TextInputEditText etAccountNumber = dialogView.findViewById(com.example.btck.R.id.etAccountNumber);
+        com.google.android.material.textfield.TextInputEditText etAccountHolder = dialogView.findViewById(com.example.btck.R.id.etAccountHolder);
+
+        // Reset selectedBankInfo
+        selectedBankInfo = null;
+
+        // Pre-fill existing values
+        if (currentUser != null) {
+            if (currentUser.bankName != null)      spinnerBank.setText(currentUser.bankName, false);
+            if (currentUser.accountNumber != null) etAccountNumber.setText(currentUser.accountNumber);
+            if (currentUser.accountHolder != null) etAccountHolder.setText(currentUser.accountHolder);
+        }
+
+        // Load bank list for dropdown
+        if (bankList.isEmpty()) {
+            com.example.btck.api.RetrofitClient.getApiService().getBanks().enqueue(new retrofit2.Callback<com.example.btck.models.BanksResponse>() {
+                @Override
+                public void onResponse(@NonNull retrofit2.Call<com.example.btck.models.BanksResponse> call,
+                                       @NonNull retrofit2.Response<com.example.btck.models.BanksResponse> response) {
+                    if (response.isSuccessful() && response.body() != null
+                            && response.body().data != null) {
+                        bankList = response.body().data;
+                        if (isAdded() && getActivity() != null) {
+                            getActivity().runOnUiThread(() -> populateBankDropdown(spinnerBank));
+                        }
+                    }
+                }
+                @Override
+                public void onFailure(@NonNull retrofit2.Call<com.example.btck.models.BanksResponse> call, @NonNull Throwable t) {
+                    // Nếu API ngân hàng lỗi, người dùng vẫn có thể gõ tay
+                }
+            });
+        } else {
+            populateBankDropdown(spinnerBank);
+        }
+
+        new MaterialAlertDialogBuilder(requireContext())
+                .setTitle("🏦 Thông tin ngân hàng")
+                .setView(dialogView)
+                .setPositiveButton("Lưu", (dialog, which) -> {
+                    String bankCode = "";
+                    if (selectedBankInfo != null) {
+                        bankCode = selectedBankInfo.getDisplayName(); // shortName hoặc code
+                    } else if (spinnerBank.getText() != null) {
+                        bankCode = spinnerBank.getText().toString().trim();
+                    }
+                    String acctNum  = etAccountNumber.getText() != null
+                            ? etAccountNumber.getText().toString().trim() : "";
+                    String holder   = etAccountHolder.getText() != null
+                            ? etAccountHolder.getText().toString().trim().toUpperCase() : "";
+
+                    if (acctNum.isEmpty()) {
+                        Toast.makeText(requireContext(), "Vui lòng nhập số tài khoản", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    UpdateUserMeRequest req = new UpdateUserMeRequest();
+                    req.bankName      = bankCode;
+                    req.accountNumber = acctNum;
+                    req.accountHolder = holder;
+
+                    userRepository.updateMe(req, new UserRepository.UserCallback() {
+                        @Override
+                        public void onSuccess(UserPublic user) {
+                            currentUser = user;
+                            if (isAdded() && getActivity() != null) {
+                                getActivity().runOnUiThread(() ->
+                                        Toast.makeText(requireContext(), "✅ Đã lưu thông tin ngân hàng!", Toast.LENGTH_SHORT).show());
+                            }
+                        }
+                        @Override
+                        public void onError(String message) {
+                            if (isAdded() && getActivity() != null) {
+                                getActivity().runOnUiThread(() ->
+                                        Toast.makeText(requireContext(), "Lỗi: " + message, Toast.LENGTH_SHORT).show());
+                            }
+                        }
+                    });
+                })
+                .setNegativeButton("Huỷ", null)
+                .show();
+    }
+
+    private void populateBankDropdown(android.widget.AutoCompleteTextView spinner) {
+        java.util.List<String> names = new java.util.ArrayList<>();
+        for (com.example.btck.models.BankInfo b : bankList) {
+            names.add(b.getDisplayName() + " (" + b.bin + ")");
+        }
+        android.widget.ArrayAdapter<String> adapter = new android.widget.ArrayAdapter<>(
+                requireContext(), android.R.layout.simple_dropdown_item_1line, names);
+        spinner.setAdapter(adapter);
+
+        spinner.setOnItemClickListener((parent, view, position, id) -> {
+            String selectedString = (String) parent.getItemAtPosition(position);
+            for (com.example.btck.models.BankInfo b : bankList) {
+                if ((b.getDisplayName() + " (" + b.bin + ")").equals(selectedString)) {
+                    selectedBankInfo = b;
+                    break;
+                }
+            }
+        });
     }
 
     private void showAboutDialog() {

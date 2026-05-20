@@ -32,8 +32,7 @@ public class EventViewModel extends AndroidViewModel {
     public void loadEvents() {
         isLoading.setValue(true);
         repository.getEvents(0, 100, events, errorMessage);
-        events.observeForever(e -> isLoading.setValue(false));
-        errorMessage.observeForever(e -> isLoading.setValue(false));
+        // isLoading sẽ được reset ở observer trong Activity/Fragment
     }
 
     public void createEvent(String name, String description) {

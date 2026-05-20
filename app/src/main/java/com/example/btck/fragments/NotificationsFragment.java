@@ -1,5 +1,6 @@
 package com.example.btck.fragments;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.*;
 import android.widget.Toast;
@@ -10,12 +11,16 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.example.btck.R;
+import com.example.btck.activities.ExpenseDetailActivity;
+import com.example.btck.activities.GroupDetailActivity;
+import com.example.btck.activities.SettlementActivity;
 import com.example.btck.adapters.NotificationAdapter;
 import com.example.btck.api.ApiService;
 import com.example.btck.api.RetrofitClient;
 import com.example.btck.databinding.FragmentNotificationsBinding;
 import com.example.btck.models.NotificationPublic;
 import com.example.btck.models.NotificationsPublic;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import java.util.ArrayList;
 import java.util.List;
 import retrofit2.Call;
@@ -52,6 +57,7 @@ public class NotificationsFragment extends Fragment {
     private void setupRecyclerView() {
         adapter = new NotificationAdapter(notifList, notif -> {
             if (!notif.isRead) markAsRead(notif);
+            openNotification(notif);
         });
         binding.rvNotifications.setLayoutManager(new LinearLayoutManager(requireContext()));
         binding.rvNotifications.setAdapter(adapter);
@@ -89,6 +95,38 @@ public class NotificationsFragment extends Fragment {
             }
             @Override public void onFailure(Call<NotificationPublic> call, Throwable t) {}
         });
+    }
+
+    private void openNotification(NotificationPublic notif) {
+        String type = notif.type != null ? notif.type.toUpperCase() : "";
+        if ("EXPENSE_CREATED".equals(type) && notif.eventId != null && notif.referenceId != null) {
+            Intent intent = new Intent(requireContext(), ExpenseDetailActivity.class);
+            intent.putExtra("event_id", notif.eventId);
+            intent.putExtra("expense_id", notif.referenceId);
+            startActivity(intent);
+            return;
+        }
+
+        if ("SETTLEMENT_RECORDED".equals(type) && notif.eventId != null) {
+            Intent intent = new Intent(requireContext(), SettlementActivity.class);
+            intent.putExtra("event_id", notif.eventId);
+            startActivity(intent);
+            return;
+        }
+
+        if (notif.eventId != null) {
+            Intent intent = new Intent(requireContext(), GroupDetailActivity.class);
+            intent.putExtra("event_id", notif.eventId);
+            startActivity(intent);
+            return;
+        }
+
+        new MaterialAlertDialogBuilder(requireContext())
+                .setTitle(notif.title != null ? notif.title : "Thông báo")
+                .setMessage((notif.content != null ? notif.content : "")
+                        + (notif.createdAt != null ? "\n\n" + notif.createdAt : ""))
+                .setPositiveButton("Đóng", null)
+                .show();
     }
 
     private void markAllRead() {

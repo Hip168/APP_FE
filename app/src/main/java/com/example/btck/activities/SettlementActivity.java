@@ -124,13 +124,9 @@ public class SettlementActivity extends AppCompatActivity {
             return;
         }
 
-        // Build payer/receiver options from memberBalances
         List<String> names = new ArrayList<>();
         for (UserBalance b : memberBalances) names.add(b.getDisplayName());
         String[] nameArr = names.toArray(new String[0]);
-
-        final int[] fromIndex = {-1}, toIndex = {-1};
-        final long[] amount = {0};
 
         View dialogView = getLayoutInflater().inflate(com.example.btck.R.layout.dialog_settle, null);
         android.widget.Spinner spFrom = dialogView.findViewById(com.example.btck.R.id.spinnerFrom);
@@ -144,10 +140,30 @@ public class SettlementActivity extends AppCompatActivity {
         spFrom.setAdapter(adapter);
         spTo.setAdapter(adapter);
 
-        // Pre-fill from current user's debt
+        int currentUserIndex = -1;
         for (int i = 0; i < memberBalances.size(); i++) {
             if (memberBalances.get(i).userId != null && memberBalances.get(i).userId.equals(currentUserId)) {
-                spFrom.setSelection(i);
+                currentUserIndex = i;
+                break;
+            }
+        }
+        if (currentUserIndex == -1) {
+            Toast.makeText(this, "Không tìm thấy tài khoản hiện tại trong nhóm", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        spFrom.setSelection(currentUserIndex);
+        spFrom.setEnabled(false);
+
+        for (SimplifiedDebt debt : debtList) {
+            if (currentUserId != null && currentUserId.equals(debt.fromUserId)) {
+                for (int i = 0; i < memberBalances.size(); i++) {
+                    if (debt.toUserId != null && debt.toUserId.equals(memberBalances.get(i).userId)) {
+                        spTo.setSelection(i);
+                        etAmount.setText(String.valueOf(debt.amount));
+                        break;
+                    }
+                }
                 break;
             }
         }
@@ -156,11 +172,12 @@ public class SettlementActivity extends AppCompatActivity {
                 .setTitle("Ghi nhận thanh toán")
                 .setView(dialogView)
                 .setPositiveButton("Xác nhận", (dialog, which) -> {
-                    String fromId = memberBalances.get(spFrom.getSelectedItemPosition()).userId;
+                    String fromId = currentUserId;
                     String toId = memberBalances.get(spTo.getSelectedItemPosition()).userId;
                     String amtStr = etAmount.getText().toString().trim();
                     String note = etNote.getText().toString().trim();
 
+                    if (fromId == null) { Toast.makeText(this, "Bạn cần đăng nhập lại", Toast.LENGTH_SHORT).show(); return; }
                     if (fromId.equals(toId)) { Toast.makeText(this, "Không thể tự thanh toán cho mình", Toast.LENGTH_SHORT).show(); return; }
                     if (amtStr.isEmpty()) { Toast.makeText(this, "Nhập số tiền", Toast.LENGTH_SHORT).show(); return; }
 

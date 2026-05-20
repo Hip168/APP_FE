@@ -9,6 +9,7 @@ import com.example.btck.api.RetrofitClient;
 import com.example.btck.databinding.ActivityJoinEventBinding;
 import com.example.btck.models.EventMemberPublic;
 import com.example.btck.managers.TokenManager;
+import com.example.btck.utils.InviteCodeUtils;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -35,7 +36,7 @@ public class JoinEventActivity extends AppCompatActivity {
 
         binding.btnJoin.setOnClickListener(v -> {
             String code = binding.etCode.getText() != null
-                    ? binding.etCode.getText().toString().trim() : "";
+                    ? InviteCodeUtils.normalize(binding.etCode.getText().toString()) : "";
             if (code.isEmpty()) {
                 binding.tilCode.setError("Vui lòng nhập mã mời");
                 return;
@@ -49,8 +50,9 @@ public class JoinEventActivity extends AppCompatActivity {
         if (intent != null && intent.getData() != null) {
             String code = intent.getData().getQueryParameter("code");
             if (code != null && !code.isEmpty()) {
-                binding.etCode.setText(code);
-                joinByCode(code);
+                String normalizedCode = InviteCodeUtils.normalize(code);
+                binding.etCode.setText(normalizedCode);
+                joinByCode(normalizedCode);
             }
         }
     }
@@ -87,8 +89,10 @@ public class JoinEventActivity extends AppCompatActivity {
                                 finish();
                             }, 1500);
                         } else {
+                            // Parse lỗi thực từ backend thay vì hardcode message
+                            String errorMsg = parseErrorDetail(response);
                             binding.tvStatus.setVisibility(View.VISIBLE);
-                            binding.tvStatus.setText("❌ Mã mời không hợp lệ hoặc đã hết hạn");
+                            binding.tvStatus.setText("❌ " + errorMsg);
                             binding.tvStatus.setTextColor(getColor(com.example.btck.R.color.color_owe));
                         }
                     }
@@ -101,5 +105,31 @@ public class JoinEventActivity extends AppCompatActivity {
                                 "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 });
+    }
+
+    /** Đọc field "detail" từ error body của backend */
+    private String parseErrorDetail(retrofit2.Response<?> response) {
+        try {
+            if (response.errorBody() != null) {
+                String raw = response.errorBody().string();
+                // Parse thủ công để tránh phụ thuộc thêm thư viện
+                org.json.JSONObject json = new org.json.JSONObject(raw);
+                if (json.has("detail")) {
+                    String detail = json.getString("detail");
+                    // Dịch các message phổ biến sang tiếng Việt
+                    switch (detail) {
+                        case "Invalid or expired invite code":
+                            return "Mã mời không hợp lệ hoặc đã hết hạn";
+                        case "Already a member of this event":
+                            return "Bạn đã là thành viên của nhóm này rồi";
+                        case "Event not found":
+                            return "Không tìm thấy nhóm";
+                        default:
+                            return detail; // Hiển thị nguyên văn nếu chưa có bản dịch
+                    }
+                }
+            }
+        } catch (Exception ignored) {}
+        return "Tham gia thất bại (lỗi " + response.code() + ")";
     }
 }

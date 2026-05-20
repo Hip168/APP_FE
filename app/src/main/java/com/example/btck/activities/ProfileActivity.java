@@ -36,6 +36,7 @@ public class ProfileActivity extends AppCompatActivity {
     private TokenManager tokenManager;
     private UserPublic currentUser;
     private List<BankInfo> bankList = new ArrayList<>();
+    private BankInfo selectedBankInfo = null; // Ngân hàng đang được chọn
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -189,6 +190,9 @@ public class ProfileActivity extends AppCompatActivity {
         TextInputEditText etAccountNumber = dialogView.findViewById(R.id.etAccountNumber);
         TextInputEditText etAccountHolder = dialogView.findViewById(R.id.etAccountHolder);
 
+        // Reset selectedBankInfo
+        selectedBankInfo = null;
+
         // Pre-fill existing values
         if (currentUser != null) {
             if (currentUser.bankName != null)      spinnerBank.setText(currentUser.bankName, false);
@@ -221,8 +225,13 @@ public class ProfileActivity extends AppCompatActivity {
                 .setTitle("🏦 Thông tin ngân hàng")
                 .setView(dialogView)
                 .setPositiveButton("Lưu", (dialog, which) -> {
-                    String bankCode = spinnerBank.getText() != null
-                            ? spinnerBank.getText().toString().trim() : "";
+                    // Dùng selectedBankInfo nếu đã chọn từ dropdown, ngược lại dùng text gõ tay
+                    String bankCode = "";
+                    if (selectedBankInfo != null) {
+                        bankCode = selectedBankInfo.getDisplayName(); // shortName hoặc code
+                    } else if (spinnerBank.getText() != null) {
+                        bankCode = spinnerBank.getText().toString().trim();
+                    }
                     String acctNum  = etAccountNumber.getText() != null
                             ? etAccountNumber.getText().toString().trim() : "";
                     String holder   = etAccountHolder.getText() != null
@@ -266,6 +275,17 @@ public class ProfileActivity extends AppCompatActivity {
         ArrayAdapter<String> adapter = new ArrayAdapter<>(
                 this, android.R.layout.simple_dropdown_item_1line, names);
         spinner.setAdapter(adapter);
+
+        // Khi người dùng chọn từ danh sách, lưu lại đối tượng BankInfo tương ứng
+        spinner.setOnItemClickListener((parent, view, position, id) -> {
+            String selectedString = (String) parent.getItemAtPosition(position);
+            for (BankInfo b : bankList) {
+                if ((b.getDisplayName() + " (" + b.bin + ")").equals(selectedString)) {
+                    selectedBankInfo = b;
+                    break;
+                }
+            }
+        });
     }
 
     // ── Show QR ─────────────────────────────────────────────────────────────────

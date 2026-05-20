@@ -25,7 +25,6 @@ public class ExpenseViewModel extends AndroidViewModel {
     public void loadExpenses(String eventId) {
         isLoading.setValue(true);
         repository.getExpenses(eventId, 0, 100, expenses, errorMessage);
-        expenses.observeForever(e -> isLoading.setValue(false));
     }
 
     public void createExpense(String eventId, ExpenseCreate body) {

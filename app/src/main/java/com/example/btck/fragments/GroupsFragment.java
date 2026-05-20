@@ -16,12 +16,23 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.example.btck.R;
 import com.example.btck.activities.GroupDetailActivity;
 import com.example.btck.adapters.EventAdapter;
+import com.example.btck.api.RetrofitClient;
 import com.example.btck.databinding.FragmentGroupsBinding;
 import com.example.btck.models.EventPublic;
+import com.example.btck.models.SimplifiedDebt;
+import com.example.btck.models.SimplifiedDebtsResponse;
+import com.example.btck.managers.TokenManager;
+import com.example.btck.utils.InviteCodeUtils;
 import com.example.btck.viewmodel.EventViewModel;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class GroupsFragment extends Fragment {
 
@@ -29,6 +40,8 @@ public class GroupsFragment extends Fragment {
     private EventViewModel viewModel;
     private EventAdapter adapter;
     private List<EventPublic> eventList = new ArrayList<>();
+    private Map<String, EventAdapter.BalanceHint> balanceHints = new HashMap<>();
+    private String currentUserId;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -40,6 +53,7 @@ public class GroupsFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         viewModel = new ViewModelProvider(requireActivity()).get(EventViewModel.class);
+        currentUserId = new TokenManager(requireContext()).getUserId();
 
         setupRecyclerView();
         observeData();
@@ -71,6 +85,7 @@ public class GroupsFragment extends Fragment {
                 eventList.clear();
                 eventList.addAll(result.data);
                 adapter.notifyDataSetChanged();
+                loadBalanceHints(result.data);
                 binding.tvGroupCount.setText(result.count + " nhóm");
                 boolean empty = result.data.isEmpty();
                 binding.layoutEmpty.setVisibility(empty ? View.VISIBLE : View.GONE);
@@ -136,7 +151,7 @@ public class GroupsFragment extends Fragment {
                 .setTitle("Tham gia nhóm")
                 .setView(dialogView)
                 .setPositiveButton("Tham gia", (dialog, which) -> {
-                    String code = etCode.getText().toString().trim();
+                    String code = InviteCodeUtils.normalize(etCode.getText().toString());
                     if (TextUtils.isEmpty(code)) {
                         Toast.makeText(requireContext(), "Vui lòng nhập mã mời", Toast.LENGTH_SHORT).show();
                         return;
@@ -149,6 +164,74 @@ public class GroupsFragment extends Fragment {
 
     private void loadData() {
         viewModel.loadEvents();
+    }
+
+    private void loadBalanceHints(List<EventPublic> events) {
+        balanceHints.clear();
+        adapter.setBalanceHints(balanceHints);
+        if (currentUserId == null) return;
+
+        for (EventPublic event : events) {
+            if (event.expenseCount <= 0) {
+                balanceHints.put(event.id, new EventAdapter.BalanceHint("Chưa có khoản nợ", R.color.text_secondary));
+                adapter.setBalanceHints(new HashMap<>(balanceHints));
+                continue;
+            }
+
+            RetrofitClient.getApiService().getSimplifiedDebts(event.id)
+                    .enqueue(new Callback<SimplifiedDebtsResponse>() {
+                        @Override
+                        public void onResponse(Call<SimplifiedDebtsResponse> call, Response<SimplifiedDebtsResponse> response) {
+                            if (!isAdded()) return;
+                            if (response.isSuccessful() && response.body() != null && response.body().debts != null) {
+                                balanceHints.put(event.id, buildBalanceHint(response.body().debts));
+                            } else {
+                                balanceHints.put(event.id, new EventAdapter.BalanceHint("Không tải được số dư", R.color.text_secondary));
+                            }
+                            adapter.setBalanceHints(new HashMap<>(balanceHints));
+                        }
+
+                        @Override
+                        public void onFailure(Call<SimplifiedDebtsResponse> call, Throwable t) {
+                            if (!isAdded()) return;
+                            balanceHints.put(event.id, new EventAdapter.BalanceHint("Không tải được số dư", R.color.text_secondary));
+                            adapter.setBalanceHints(new HashMap<>(balanceHints));
+                        }
+                    });
+        }
+    }
+
+    private EventAdapter.BalanceHint buildBalanceHint(List<SimplifiedDebt> debts) {
+        long youOwe = 0;
+        long owedToYou = 0;
+        List<String> snippets = new ArrayList<>();
+
+        for (SimplifiedDebt debt : debts) {
+            if (currentUserId.equals(debt.fromUserId)) {
+                youOwe += debt.amount;
+                snippets.add("Bạn nợ " + debt.getToDisplayName() + " " + formatMoney(debt.amount));
+            } else if (currentUserId.equals(debt.toUserId)) {
+                owedToYou += debt.amount;
+                snippets.add(debt.getFromDisplayName() + " nợ bạn " + formatMoney(debt.amount));
+            }
+        }
+
+        if (snippets.isEmpty()) {
+            return new EventAdapter.BalanceHint("Đã cân bằng", R.color.color_owed);
+        }
+
+        String text = snippets.size() > 1
+                ? snippets.get(0) + " +" + (snippets.size() - 1) + " khoản"
+                : snippets.get(0);
+        int color = youOwe > 0 ? R.color.color_owe : R.color.color_owed;
+        return new EventAdapter.BalanceHint(text, color);
+    }
+
+    private String formatMoney(long amount) {
+        if (amount >= 1_000_000) {
+            return String.format(Locale.getDefault(), "%.1f triệuđ", amount / 1_000_000.0);
+        }
+        return String.format(Locale.getDefault(), "%,dđ", amount);
     }
 
     @Override

@@ -65,7 +65,7 @@ public interface ApiService {
     @GET("users/{user_id}/payment-qr")
     Call<PaymentQrResponse> getPaymentQr(
             @Path("user_id") String userId,
-            @Query("amount") int amount,
+            @Query("amount") long amount,
             @Query("description") String description
     );
 

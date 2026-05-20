@@ -11,11 +11,14 @@ public class SettlementCreate {
     public long amount;
     @SerializedName("note")
     public String note;
+    @SerializedName("idempotency_key")
+    public String idempotencyKey;
 
-    public SettlementCreate(String fromUserId, String toUserId, long amount, String note) {
+    public SettlementCreate(String fromUserId, String toUserId, long amount, String note, String idempotencyKey) {
         this.fromUserId = fromUserId;
         this.toUserId = toUserId;
         this.amount = amount;
         this.note = note;
+        this.idempotencyKey = idempotencyKey;
     }
 }

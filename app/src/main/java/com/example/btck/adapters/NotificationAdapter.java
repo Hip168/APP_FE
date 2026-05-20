@@ -72,9 +72,12 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         private String getTypeIcon(String type) {
             if (type == null) return "🔔";
             switch (type.toLowerCase()) {
-                case "expense_added": return "💸";
-                case "settlement": return "✅";
-                case "member_joined": return "👥";
+                case "expense_added":
+                case "expense_created": return "💸";
+                case "settlement":
+                case "settlement_recorded": return "✅";
+                case "member_joined":
+                case "member_added": return "👥";
                 case "event_created": return "🎉";
                 default: return "🔔";
             }

@@ -76,7 +76,8 @@ public class HomeFragment extends Fragment {
             startActivity(intent);
         });
         binding.rvRecentGroups.setLayoutManager(
-                new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false));
+                new LinearLayoutManager(requireContext()));
+        binding.rvRecentGroups.setNestedScrollingEnabled(false);
         binding.rvRecentGroups.setAdapter(recentGroupAdapter);
     }
 
@@ -84,7 +85,7 @@ public class HomeFragment extends Fragment {
         eventViewModel.events.observe(getViewLifecycleOwner(), result -> {
             if (result != null && result.data != null) {
                 eventList.clear();
-                int limit = Math.min(result.data.size(), 5);
+                int limit = Math.min(result.data.size(), 3);
                 eventList.addAll(result.data.subList(0, limit));
                 recentGroupAdapter.notifyDataSetChanged();
                 binding.tvGroupCount.setText(result.count + " nhóm");
@@ -106,17 +107,27 @@ public class HomeFragment extends Fragment {
                 long owe = balance.summary.totalYouOwe;
                 long owed = balance.summary.totalOwedToYou;
                 long net = balance.summary.netBalance;
-                binding.tvTotalOwe.setText(String.format("-%,dđ", owe));
-                binding.tvTotalOwed.setText(String.format("+%,dđ", owed));
+                binding.tvTotalOwe.setText("-" + formatMoney(owe));
+                binding.tvTotalOwed.setText("+" + formatMoney(owed));
                 if (net >= 0) {
-                    binding.tvNetBalance.setText(String.format("+%,dđ", net));
+                    binding.tvNetBalance.setText("+" + formatMoney(net));
                     binding.tvNetBalance.setTextColor(requireContext().getColor(com.example.btck.R.color.color_owed));
                 } else {
-                    binding.tvNetBalance.setText(String.format("-%,dđ", Math.abs(net)));
+                    binding.tvNetBalance.setText("-" + formatMoney(Math.abs(net)));
                     binding.tvNetBalance.setTextColor(requireContext().getColor(com.example.btck.R.color.color_owe));
                 }
             }
         });
+    }
+
+    private String formatMoney(long amount) {
+        if (amount >= 1_000_000_000) {
+            return String.format(Locale.getDefault(), "%.1f tỷđ", amount / 1_000_000_000.0);
+        }
+        if (amount >= 1_000_000) {
+            return String.format(Locale.getDefault(), "%.1f triệuđ", amount / 1_000_000.0);
+        }
+        return String.format(Locale.getDefault(), "%,dđ", amount);
     }
 
     private void loadData() {

@@ -18,15 +18,14 @@
         android:id="@+id/tilCode"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Mã mời (8 ký tự)"
+        android:hint="Mã mời hoặc link mời"
         style="@style/InputStyle">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/etCode"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="textCapCharacters"
-            android:maxLength="8"
+            android:inputType="textCapCharacters|textNoSuggestions"
             android:letterSpacing="0.15" />
     </com.google.android.material.textfield.TextInputLayout>
 

@@ -179,12 +179,25 @@
                 android:id="@+id/btnShareQr"
                 android:layout_width="match_parent"
                 android:layout_height="52dp"
+                android:layout_marginBottom="12dp"
                 android:text="Chia sẻ mã QR"
                 android:textSize="15sp"
                 android:textStyle="bold"
                 app:backgroundTint="@color/mint_primary"
                 app:cornerRadius="14dp"
                 style="@style/Widget.MaterialComponents.Button"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSaveQr"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:text="Lưu ảnh QR"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:textColor="@color/mint_dark"
+                app:strokeColor="@color/mint_primary"
+                app:cornerRadius="14dp"/>
 
         </LinearLayout>
     </ScrollView>
