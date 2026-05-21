@@ -106,7 +106,7 @@ public class PaymentQrActivity extends AppCompatActivity {
                         binding.progressBar.setVisibility(View.GONE);
                         binding.ivQrCode.setImageResource(com.example.btck.R.drawable.ic_groups);
                         Toast.makeText(PaymentQrActivity.this,
-                                "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                                "Lỗi mạng", Toast.LENGTH_SHORT).show();
                     }
                 });
     }

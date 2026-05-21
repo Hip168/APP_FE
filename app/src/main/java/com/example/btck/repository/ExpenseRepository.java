@@ -19,7 +19,7 @@ public class ExpenseRepository {
                 if (response.isSuccessful() && response.body() != null) onSuccess.postValue(response.body());
                 else onError.postValue(parseError(response));
             }
-            @Override public void onFailure(Call<ExpensesPublic> call, Throwable t) { onError.postValue("Lỗi kết nối: " + t.getMessage()); }
+            @Override public void onFailure(Call<ExpensesPublic> call, Throwable t) { onError.postValue("Lỗi mạng"); }
         });
     }
 
@@ -30,7 +30,7 @@ public class ExpenseRepository {
                 if (response.isSuccessful() && response.body() != null) onSuccess.postValue(response.body());
                 else onError.postValue(parseError(response));
             }
-            @Override public void onFailure(Call<ExpensePublic> call, Throwable t) { onError.postValue("Lỗi kết nối: " + t.getMessage()); }
+            @Override public void onFailure(Call<ExpensePublic> call, Throwable t) { onError.postValue("Lỗi mạng"); }
         });
     }
 
@@ -41,7 +41,7 @@ public class ExpenseRepository {
                 if (response.isSuccessful() && response.body() != null) onSuccess.postValue(response.body());
                 else onError.postValue(parseError(response));
             }
-            @Override public void onFailure(Call<ExpensePublic> call, Throwable t) { onError.postValue("Lỗi kết nối: " + t.getMessage()); }
+            @Override public void onFailure(Call<ExpensePublic> call, Throwable t) { onError.postValue("Lỗi mạng"); }
         });
     }
 
@@ -52,7 +52,7 @@ public class ExpenseRepository {
                 if (response.isSuccessful()) onSuccess.postValue(true);
                 else onError.postValue(parseError(response));
             }
-            @Override public void onFailure(Call<MessageResponse> call, Throwable t) { onError.postValue("Lỗi kết nối: " + t.getMessage()); }
+            @Override public void onFailure(Call<MessageResponse> call, Throwable t) { onError.postValue("Lỗi mạng"); }
         });
     }
 

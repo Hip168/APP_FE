@@ -330,7 +330,7 @@ public class ProfileFragment extends Fragment {
                             if (!isAdded() || getActivity() == null) return;
                             requireActivity().runOnUiThread(() ->
                                     Toast.makeText(requireContext(),
-                                            "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show());
+                                            "Lỗi mạng", Toast.LENGTH_SHORT).show());
                         }
                     });
 

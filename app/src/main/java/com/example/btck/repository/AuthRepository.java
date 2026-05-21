@@ -30,7 +30,7 @@ public class AuthRepository {
             }
             @Override
             public void onFailure(Call<TokenResponse> call, Throwable t) {
-                onError.postValue("Lỗi kết nối: " + t.getMessage());
+                onError.postValue("Lỗi mạng");
             }
         });
     }
@@ -50,7 +50,7 @@ public class AuthRepository {
             }
             @Override
             public void onFailure(Call<UserPublic> call, Throwable t) {
-                onError.postValue("Lỗi kết nối: " + t.getMessage());
+                onError.postValue("Lỗi mạng");
             }
         });
     }
@@ -69,7 +69,7 @@ public class AuthRepository {
             }
             @Override
             public void onFailure(Call<MessageResponse> call, Throwable t) {
-                onError.postValue("Lỗi kết nối: " + t.getMessage());
+                onError.postValue("Lỗi mạng");
             }
         });
     }
@@ -86,7 +86,7 @@ public class AuthRepository {
             }
             @Override
             public void onFailure(Call<UserPublic> call, Throwable t) {
-                onError.postValue("Lỗi kết nối: " + t.getMessage());
+                onError.postValue("Lỗi mạng");
             }
         });
     }

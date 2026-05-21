@@ -26,7 +26,7 @@ public class EventRepository {
                 else onError.postValue(parseError(response));
             }
             @Override
-            public void onFailure(Call<EventsPublic> call, Throwable t) { onError.postValue("Lỗi kết nối: " + t.getMessage()); }
+            public void onFailure(Call<EventsPublic> call, Throwable t) { onError.postValue("Lỗi mạng"); }
         });
     }
 
@@ -40,7 +40,7 @@ public class EventRepository {
                 else onError.postValue(parseError(response));
             }
             @Override
-            public void onFailure(Call<EventPublic> call, Throwable t) { onError.postValue("Lỗi kết nối: " + t.getMessage()); }
+            public void onFailure(Call<EventPublic> call, Throwable t) { onError.postValue("Lỗi mạng"); }
         });
     }
 
@@ -54,7 +54,7 @@ public class EventRepository {
                 else onError.postValue(parseError(response));
             }
             @Override
-            public void onFailure(Call<EventPublic> call, Throwable t) { onError.postValue("Lỗi kết nối: " + t.getMessage()); }
+            public void onFailure(Call<EventPublic> call, Throwable t) { onError.postValue("Lỗi mạng"); }
         });
     }
 
@@ -68,7 +68,7 @@ public class EventRepository {
                 else onError.postValue(parseError(response));
             }
             @Override
-            public void onFailure(Call<MessageResponse> call, Throwable t) { onError.postValue("Lỗi kết nối: " + t.getMessage()); }
+            public void onFailure(Call<MessageResponse> call, Throwable t) { onError.postValue("Lỗi mạng"); }
         });
     }
 
@@ -82,7 +82,7 @@ public class EventRepository {
                 else onError.postValue(parseError(response));
             }
             @Override
-            public void onFailure(Call<EventMemberPublic> call, Throwable t) { onError.postValue("Lỗi kết nối: " + t.getMessage()); }
+            public void onFailure(Call<EventMemberPublic> call, Throwable t) { onError.postValue("Lỗi mạng"); }
         });
     }
 
@@ -96,7 +96,7 @@ public class EventRepository {
                 else onError.postValue(parseError(response));
             }
             @Override
-            public void onFailure(Call<EventBalances> call, Throwable t) { onError.postValue("Lỗi kết nối: " + t.getMessage()); }
+            public void onFailure(Call<EventBalances> call, Throwable t) { onError.postValue("Lỗi mạng"); }
         });
     }
 
@@ -110,7 +110,7 @@ public class EventRepository {
                 else onError.postValue(parseError(response));
             }
             @Override
-            public void onFailure(Call<SimplifiedDebtsResponse> call, Throwable t) { onError.postValue("Lỗi kết nối: " + t.getMessage()); }
+            public void onFailure(Call<SimplifiedDebtsResponse> call, Throwable t) { onError.postValue("Lỗi mạng"); }
         });
     }
 
@@ -124,7 +124,7 @@ public class EventRepository {
                 else onError.postValue(parseError(response));
             }
             @Override
-            public void onFailure(Call<EventStats> call, Throwable t) { onError.postValue("Lỗi kết nối: " + t.getMessage()); }
+            public void onFailure(Call<EventStats> call, Throwable t) { onError.postValue("Lỗi mạng"); }
         });
     }
 
@@ -136,7 +136,7 @@ public class EventRepository {
                 else onError.postValue(parseError(response));
             }
             @Override
-            public void onFailure(Call<MyBalanceDetail> call, Throwable t) { onError.postValue("Lỗi kết nối: " + t.getMessage()); }
+            public void onFailure(Call<MyBalanceDetail> call, Throwable t) { onError.postValue("Lỗi mạng"); }
         });
     }
 
@@ -150,7 +150,7 @@ public class EventRepository {
                 else onError.postValue(parseError(response));
             }
             @Override
-            public void onFailure(Call<InviteCodePublic> call, Throwable t) { onError.postValue("Lỗi kết nối: " + t.getMessage()); }
+            public void onFailure(Call<InviteCodePublic> call, Throwable t) { onError.postValue("Lỗi mạng"); }
         });
     }
 
@@ -164,7 +164,7 @@ public class EventRepository {
                 else onError.postValue(parseError(response));
             }
             @Override
-            public void onFailure(Call<EventMemberPublic> call, Throwable t) { onError.postValue("Lỗi kết nối: " + t.getMessage()); }
+            public void onFailure(Call<EventMemberPublic> call, Throwable t) { onError.postValue("Lỗi mạng"); }
         });
     }
 

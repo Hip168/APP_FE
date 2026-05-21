@@ -94,7 +94,7 @@ public class MainActivity extends AppCompatActivity {
 
                     @Override
                     public void onFailure(@NonNull Call<MessageResponse> call, @NonNull Throwable t) {
-                        Log.e("MainActivity", "Lỗi kết nối khi gửi FCM Token: " + t.getMessage());
+                        Log.e("MainActivity", "Lỗi mạng");
                     }
                 });
     }
@@ -131,7 +131,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(@NonNull Call<com.example.btck.models.UnreadCountResponse> call, @NonNull Throwable t) {
-                Log.e("MainActivity", "Lỗi tải số thông báo chưa đọc: " + t.getMessage());
+                Log.e("MainActivity", "Lỗi mạng");
             }
         });
     }

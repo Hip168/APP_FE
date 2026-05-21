@@ -237,7 +237,7 @@ public class ProfileActivity extends AppCompatActivity {
                         public void onFailure(@NonNull Call<UserPublic> call, @NonNull Throwable t) {
                             runOnUiThread(() ->
                                     Toast.makeText(ProfileActivity.this,
-                                            "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show());
+                                            "Lỗi mạng", Toast.LENGTH_SHORT).show());
                         }
                     });
 

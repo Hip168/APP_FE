@@ -102,7 +102,7 @@ public class JoinEventActivity extends AppCompatActivity {
                         binding.progressBar.setVisibility(View.GONE);
                         binding.btnJoin.setEnabled(true);
                         Toast.makeText(JoinEventActivity.this,
-                                "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                                "Lỗi mạng", Toast.LENGTH_SHORT).show();
                     }
                 });
     }

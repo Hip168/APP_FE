@@ -40,7 +40,7 @@ public class UserRepository {
                 else callback.onError(parseError(response));
             }
             @Override public void onFailure(Call<UserPublic> call, Throwable t) {
-                callback.onError("Lỗi kết nối: " + t.getMessage());
+                callback.onError("Lỗi mạng");
             }
         });
     }
@@ -52,7 +52,7 @@ public class UserRepository {
                 else callback.onError(parseError(response));
             }
             @Override public void onFailure(Call<MessageResponse> call, Throwable t) {
-                callback.onError("Lỗi kết nối: " + t.getMessage());
+                callback.onError("Lỗi mạng");
             }
         });
     }
@@ -65,7 +65,7 @@ public class UserRepository {
                 if (response.isSuccessful() && response.body() != null) onSuccess.postValue(response.body());
                 else onError.postValue(parseError(response));
             }
-            @Override public void onFailure(Call<UserPublic> call, Throwable t) { onError.postValue("Lỗi kết nối: " + t.getMessage()); }
+            @Override public void onFailure(Call<UserPublic> call, Throwable t) { onError.postValue("Lỗi mạng"); }
         });
     }
 
@@ -76,7 +76,7 @@ public class UserRepository {
                 if (response.isSuccessful()) onSuccess.postValue(true);
                 else onError.postValue(parseError(response));
             }
-            @Override public void onFailure(Call<MessageResponse> call, Throwable t) { onError.postValue("Lỗi kết nối: " + t.getMessage()); }
+            @Override public void onFailure(Call<MessageResponse> call, Throwable t) { onError.postValue("Lỗi mạng"); }
         });
     }
 
@@ -87,7 +87,7 @@ public class UserRepository {
                 if (response.isSuccessful() && response.body() != null) onSuccess.postValue(response.body());
                 else onError.postValue(parseError(response));
             }
-            @Override public void onFailure(Call<List<UserPublic>> call, Throwable t) { onError.postValue("Lỗi kết nối: " + t.getMessage()); }
+            @Override public void onFailure(Call<List<UserPublic>> call, Throwable t) { onError.postValue("Lỗi mạng"); }
         });
     }
 
@@ -97,7 +97,7 @@ public class UserRepository {
                 if (response.isSuccessful()) onSuccess.postValue(true);
                 else onError.postValue(parseError(response));
             }
-            @Override public void onFailure(Call<MessageResponse> call, Throwable t) { onError.postValue("Lỗi kết nối: " + t.getMessage()); }
+            @Override public void onFailure(Call<MessageResponse> call, Throwable t) { onError.postValue("Lỗi mạng"); }
         });
     }
 

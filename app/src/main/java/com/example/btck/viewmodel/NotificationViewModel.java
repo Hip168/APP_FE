@@ -35,7 +35,7 @@ public class NotificationViewModel extends AndroidViewModel {
                     }
                     @Override
                     public void onFailure(@NonNull Call<NotificationsPublic> call, @NonNull Throwable t) {
-                        errorMessage.postValue("Lỗi kết nối: " + t.getMessage());
+                        errorMessage.postValue("Lỗi mạng");
                     }
                 });
     }
@@ -51,7 +51,7 @@ public class NotificationViewModel extends AndroidViewModel {
                     }
                     @Override
                     public void onFailure(@NonNull Call<NotificationPublic> call, @NonNull Throwable t) {
-                        errorMessage.postValue("Lỗi: " + t.getMessage());
+                        errorMessage.postValue("Lỗi mạng");
                     }
                 });
     }
@@ -67,7 +67,7 @@ public class NotificationViewModel extends AndroidViewModel {
                     }
                     @Override
                     public void onFailure(@NonNull Call<MessageResponse> call, @NonNull Throwable t) {
-                        errorMessage.postValue("Lỗi: " + t.getMessage());
+                        errorMessage.postValue("Lỗi mạng");
                     }
                 });
     }
