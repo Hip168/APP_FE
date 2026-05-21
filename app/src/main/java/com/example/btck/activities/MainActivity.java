@@ -99,6 +99,43 @@ public class MainActivity extends AppCompatActivity {
                 });
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        updateNotificationBadge();
+    }
+
+    public void updateNotificationBadge() {
+        TokenManager tokenManager = new TokenManager(this);
+        if (!tokenManager.isLoggedIn()) {
+            return;
+        }
+
+        RetrofitClient.getApiService().getUnreadCount().enqueue(new Callback<com.example.btck.models.UnreadCountResponse>() {
+            @Override
+            public void onResponse(@NonNull Call<com.example.btck.models.UnreadCountResponse> call,
+                                   @NonNull Response<com.example.btck.models.UnreadCountResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    int count = response.body().count;
+                    com.google.android.material.badge.BadgeDrawable badge = binding.bottomNav.getOrCreateBadge(R.id.nav_notifications);
+                    if (count > 0) {
+                        badge.setVisible(true);
+                        badge.setMaxNumber(10);
+                        badge.setNumber(count);
+                    } else {
+                        badge.setVisible(false);
+                        binding.bottomNav.removeBadge(R.id.nav_notifications);
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<com.example.btck.models.UnreadCountResponse> call, @NonNull Throwable t) {
+                Log.e("MainActivity", "Lỗi tải số thông báo chưa đọc: " + t.getMessage());
+            }
+        });
+    }
+
     private void setupBottomNavigation() {
         binding.bottomNav.setOnItemSelectedListener(item -> {
             int id = item.getItemId();

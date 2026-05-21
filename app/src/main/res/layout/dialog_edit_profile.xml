@@ -41,14 +41,18 @@
                     android:textSize="28sp"
                     android:textStyle="bold"
                     android:textColor="@color/mint_dark"
-                    android:gravity="center" />
+                    android:gravity="center"
+                    android:clickable="false"
+                    android:focusable="false" />
 
                 <ImageView
                     android:id="@+id/ivDialogAvatar"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:scaleType="centerCrop"
-                    android:visibility="gone" />
+                    android:visibility="gone"
+                    android:clickable="false"
+                    android:focusable="false" />
             </FrameLayout>
         </com.google.android.material.card.MaterialCardView>
 

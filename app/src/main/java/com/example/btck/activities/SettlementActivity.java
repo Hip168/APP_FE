@@ -85,7 +85,11 @@ public class SettlementActivity extends AppCompatActivity {
         eventViewModel.simplifiedDebts.observe(this, debts -> {
             if (debts != null && debts.debts != null) {
                 debtList.clear();
-                debtList.addAll(debts.debts);
+                for (SimplifiedDebt debt : debts.debts) {
+                    if (currentUserId != null && (currentUserId.equals(debt.fromUserId) || currentUserId.equals(debt.toUserId))) {
+                        debtList.add(debt);
+                    }
+                }
                 updateDebtSummary();
             }
         });

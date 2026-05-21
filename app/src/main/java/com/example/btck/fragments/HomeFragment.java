@@ -62,10 +62,7 @@ public class HomeFragment extends Fragment {
     }
 
     private String getGreeting() {
-        int hour = new java.util.Calendar.Builder().build().get(java.util.Calendar.HOUR_OF_DAY);
-        if (hour < 12) return "Chào buổi sáng";
-        if (hour < 18) return "Chào buổi chiều";
-        return "Chào buổi tối";
+        return "Xin chào";
     }
 
     private void setupRecyclerView() {

@@ -70,6 +70,18 @@ public class ExpenseDetailActivity extends AppCompatActivity {
             binding.tvSplits.setText(sb.toString().trim());
         }
 
+        // Load receipt image
+        if (expense.imageUrl != null && !expense.imageUrl.isEmpty()) {
+            binding.ivReceipt.setVisibility(View.VISIBLE);
+            binding.tvNoReceipt.setVisibility(View.GONE);
+            com.bumptech.glide.Glide.with(this)
+                    .load(com.example.btck.utils.ImageUtils.getFullImageUrl(expense.imageUrl))
+                    .into(binding.ivReceipt);
+        } else {
+            binding.ivReceipt.setVisibility(View.GONE);
+            binding.tvNoReceipt.setVisibility(View.VISIBLE);
+        }
+
         binding.btnDelete.setOnClickListener(v -> {
             new com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
                     .setTitle("Xoá chi tiêu")

@@ -354,7 +354,16 @@ public class GroupDetailActivity extends AppCompatActivity {
     private void renderSimplifiedDebts(List<SimplifiedDebt> debts) {
         binding.layoutSimplifiedContent.removeAllViews();
 
-        if (debts.isEmpty()) {
+        List<SimplifiedDebt> filteredDebts = new ArrayList<>();
+        if (debts != null) {
+            for (SimplifiedDebt debt : debts) {
+                if (currentUserId != null && (currentUserId.equals(debt.fromUserId) || currentUserId.equals(debt.toUserId))) {
+                    filteredDebts.add(debt);
+                }
+            }
+        }
+
+        if (filteredDebts.isEmpty()) {
             showSettledState();
             return;
         }
@@ -367,7 +376,7 @@ public class GroupDetailActivity extends AppCompatActivity {
         title.setPadding(0, 0, 0, dp(12));
         binding.layoutSimplifiedContent.addView(title);
 
-        for (SimplifiedDebt debt : debts) {
+        for (SimplifiedDebt debt : filteredDebts) {
             binding.layoutSimplifiedContent.addView(createDebtCard(debt));
         }
     }
