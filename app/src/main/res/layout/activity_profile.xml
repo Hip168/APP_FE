@@ -46,24 +46,71 @@
                     android:gravity="center"
                     android:padding="32dp">
 
-                    <!-- Avatar Circle -->
-                    <com.google.android.material.card.MaterialCardView
-                        android:layout_width="80dp"
-                        android:layout_height="80dp"
-                        app:cardCornerRadius="40dp"
-                        app:cardBackgroundColor="@color/background_white"
-                        app:cardElevation="4dp">
+                    <!-- Avatar Circle với nút camera -->
+                    <FrameLayout
+                        android:layout_width="88dp"
+                        android:layout_height="88dp">
 
-                        <TextView
-                            android:id="@+id/tvAvatarInitial"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:text="A"
-                            android:textSize="32sp"
-                            android:textStyle="bold"
-                            android:textColor="@color/mint_dark"
-                            android:gravity="center" />
-                    </com.google.android.material.card.MaterialCardView>
+                        <!-- Ảnh avatar -->
+                        <com.google.android.material.card.MaterialCardView
+                            android:id="@+id/cardAvatar"
+                            android:layout_width="88dp"
+                            android:layout_height="88dp"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:foreground="?attr/selectableItemBackground"
+                            app:cardCornerRadius="44dp"
+                            app:cardBackgroundColor="@color/background_white"
+                            app:cardElevation="4dp">
+
+                            <FrameLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent">
+
+                                <TextView
+                                    android:id="@+id/tvAvatarInitial"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:text="A"
+                                    android:textSize="32sp"
+                                    android:textStyle="bold"
+                                    android:textColor="@color/mint_dark"
+                                    android:gravity="center" />
+
+                                <ImageView
+                                    android:id="@+id/ivAvatar"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:scaleType="centerCrop"
+                                    android:visibility="gone" />
+                            </FrameLayout>
+                        </com.google.android.material.card.MaterialCardView>
+
+                        <!-- Icon camera nhỏ góc dưới phải -->
+                        <com.google.android.material.card.MaterialCardView
+                            android:id="@+id/btnEditAvatar"
+                            android:layout_width="28dp"
+                            android:layout_height="28dp"
+                            android:layout_gravity="bottom|end"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:foreground="?attr/selectableItemBackground"
+                            app:cardCornerRadius="14dp"
+                            app:cardBackgroundColor="@color/mint_dark"
+                            app:cardElevation="2dp">
+
+                            <ImageView
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:src="@android:drawable/ic_menu_camera"
+                                android:tint="@color/background_white"
+                                android:padding="4dp"
+                                android:scaleType="centerInside"
+                                android:clickable="false"
+                                android:focusable="false" />
+                        </com.google.android.material.card.MaterialCardView>
+
+                    </FrameLayout>
 
                     <TextView
                         android:id="@+id/tvFullName"

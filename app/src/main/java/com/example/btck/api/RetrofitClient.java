@@ -11,7 +11,7 @@ import java.util.concurrent.TimeUnit;
 public class RetrofitClient {
 
     // Change this to your actual backend URL
-    public static final String BASE_URL = "http://10.0.2.2:8001/api/v1/";
+    public static final String BASE_URL = "http://e1.chiasegpu.vn:24548/api/v1/";
     // For real device on same network, use your PC's IP: "http://192.168.x.x:8000/api/v1/"
 
     private static Retrofit retrofit = null;

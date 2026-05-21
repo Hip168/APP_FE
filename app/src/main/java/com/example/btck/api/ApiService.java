@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import java.util.List;
 import java.util.Map;
 import okhttp3.MultipartBody;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.*;
 
@@ -63,7 +64,7 @@ public interface ApiService {
     Call<List<UserPublic>> searchUsers(@Query("email") String email);
 
     @GET("users/{user_id}/payment-qr")
-    Call<PaymentQrResponse> getPaymentQr(
+    Call<ResponseBody> getPaymentQr(
             @Path("user_id") String userId,
             @Query("amount") long amount,
             @Query("description") String description

@@ -1,10 +1,16 @@
 package com.example.btck.activities;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import com.example.btck.R;
 import com.example.btck.databinding.ActivityMainBinding;
@@ -12,7 +18,15 @@ import com.example.btck.fragments.HomeFragment;
 import com.example.btck.fragments.GroupsFragment;
 import com.example.btck.fragments.NotificationsFragment;
 import com.example.btck.fragments.ProfileFragment;
+import com.example.btck.api.RetrofitClient;
+import com.example.btck.managers.TokenManager;
+import com.example.btck.models.FCMTokenRequest;
+import com.example.btck.models.MessageResponse;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.messaging.FirebaseMessaging;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -26,11 +40,63 @@ public class MainActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
 
         setupBottomNavigation();
+        setupFcm();
 
         // Show home by default
         if (savedInstanceState == null) {
             loadFragment(new HomeFragment());
         }
+    }
+
+    private void setupFcm() {
+        // Request notifications permission on Android 13+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
+                    != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.POST_NOTIFICATIONS}, 1001);
+            }
+        }
+
+        // Get FCM Token and register on server
+        FirebaseMessaging.getInstance().getToken().addOnCompleteListener(task -> {
+            if (!task.isSuccessful()) {
+                Log.w("MainActivity", "Lấy FCM Token thất bại", task.getException());
+                return;
+            }
+
+            String token = task.getResult();
+            Log.d("MainActivity", "FCM Token hiện tại: " + token);
+
+            TokenManager tokenManager = new TokenManager(this);
+            tokenManager.saveFcmToken(token);
+
+            if (tokenManager.isLoggedIn()) {
+                sendTokenToServer(token);
+            }
+        });
+    }
+
+    private void sendTokenToServer(String fcmToken) {
+        FCMTokenRequest request = new FCMTokenRequest(fcmToken, "android");
+        RetrofitClient.getApiService()
+                .registerFcmToken(request)
+                .enqueue(new Callback<MessageResponse>() {
+                    @Override
+                    public void onResponse(@NonNull Call<MessageResponse> call,
+                                           @NonNull Response<MessageResponse> response) {
+                        if (response.isSuccessful()) {
+                            Log.d("MainActivity", "FCM Token đã gửi lên server thành công");
+                        } else {
+                            Log.e("MainActivity", "Gửi FCM Token thất bại: " + response.code());
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(@NonNull Call<MessageResponse> call, @NonNull Throwable t) {
+                        Log.e("MainActivity", "Lỗi kết nối khi gửi FCM Token: " + t.getMessage());
+                    }
+                });
     }
 
     private void setupBottomNavigation() {

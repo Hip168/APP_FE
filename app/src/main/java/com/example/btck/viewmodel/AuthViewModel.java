@@ -65,6 +65,23 @@ public class AuthViewModel extends AndroidViewModel {
     }
 
     public void logout() {
+        String token = tokenManager.getFcmToken();
+        if (token != null) {
+            RetrofitClient.getApiService()
+                    .unregisterFcmToken(token)
+                    .enqueue(new retrofit2.Callback<MessageResponse>() {
+                        @Override
+                        public void onResponse(retrofit2.Call<MessageResponse> call,
+                                               retrofit2.Response<MessageResponse> response) {
+                            // Token successfully unregistered from server in background
+                        }
+
+                        @Override
+                        public void onFailure(retrofit2.Call<MessageResponse> call, Throwable t) {
+                            // Unregister call failed, logged out anyway
+                        }
+                    });
+        }
         tokenManager.clearAll();
         RetrofitClient.reset();
     }

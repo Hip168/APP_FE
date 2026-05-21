@@ -19,7 +19,7 @@ import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.example.btck.api.RetrofitClient;
 import com.example.btck.databinding.ActivityPaymentQrBinding;
-import com.example.btck.models.PaymentQrResponse;
+import okhttp3.ResponseBody;
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 import retrofit2.Call;
@@ -44,14 +44,14 @@ public class PaymentQrActivity extends AppCompatActivity {
         }
         binding.toolbar.setNavigationOnClickListener(v -> onBackPressed());
 
-        String userId  = getIntent().getStringExtra("user_id");
-        long   amount  = getIntent().getLongExtra("amount", 0L);
-        String desc    = getIntent().getStringExtra("description");
-        String bankName = getIntent().getStringExtra("bank_name");
-        String acctNum  = getIntent().getStringExtra("account_number");
+        String userId    = getIntent().getStringExtra("user_id");
+        long   amount    = getIntent().getLongExtra("amount", 0L);
+        String desc      = getIntent().getStringExtra("description");
+        String bankName  = getIntent().getStringExtra("bank_name");
+        String acctNum   = getIntent().getStringExtra("account_number");
         String acctHolder = getIntent().getStringExtra("account_holder");
 
-        // Show static bank info
+        // Hiển thị bank info nếu Intent có sẵn (từ ProfileActivity)
         binding.tvBankName.setText(bankName != null && !bankName.isEmpty() ? bankName : "—");
         binding.tvAccountNumber.setText(acctNum != null && !acctNum.isEmpty() ? acctNum : "—");
         binding.tvAccountHolder.setText(acctHolder != null && !acctHolder.isEmpty() ? acctHolder : "—");
@@ -72,27 +72,27 @@ public class PaymentQrActivity extends AppCompatActivity {
 
         RetrofitClient.getApiService()
                 .getPaymentQr(userId, amount, safeDesc)
-                .enqueue(new Callback<PaymentQrResponse>() {
+                .enqueue(new Callback<ResponseBody>() {
                     @Override
-                    public void onResponse(@NonNull Call<PaymentQrResponse> call,
-                                           @NonNull Response<PaymentQrResponse> response) {
+                    public void onResponse(@NonNull Call<ResponseBody> call,
+                                           @NonNull Response<ResponseBody> response) {
                         binding.progressBar.setVisibility(View.GONE);
                         if (response.isSuccessful() && response.body() != null) {
-                            PaymentQrResponse qr = response.body();
-                            binding.tvBankName.setText(qr.bankName != null && !qr.bankName.isEmpty() ? qr.bankName : "—");
-                            binding.tvAccountNumber.setText(qr.accountNumber != null && !qr.accountNumber.isEmpty() ? qr.accountNumber : "—");
-                            binding.tvAccountHolder.setText(qr.accountHolder != null && !qr.accountHolder.isEmpty() ? qr.accountHolder : "—");
-                            if (qr.amount > 0) {
-                                binding.tvQrAmount.setText(String.format("%,dđ", qr.amount));
-                            }
-
-                            String qrUrl = qr.qrUrl;
-                            if (qrUrl != null && !qrUrl.isEmpty()) {
-                                loadQrImage(qrUrl);
-                            } else {
+                            try {
+                                String qrUrl = response.body().string();
+                                // BE trả về JSON string có dấu nháy kép bọc ngoài, cần strip
+                                if (qrUrl.startsWith("\"") && qrUrl.endsWith("\"")) {
+                                    qrUrl = qrUrl.substring(1, qrUrl.length() - 1);
+                                }
+                                if (!qrUrl.isEmpty()) {
+                                    loadQrImage(qrUrl);
+                                } else {
+                                    Toast.makeText(PaymentQrActivity.this,
+                                            "Không tải được mã QR.", Toast.LENGTH_LONG).show();
+                                }
+                            } catch (Exception e) {
                                 Toast.makeText(PaymentQrActivity.this,
-                                        "Không tải được mã QR. Hãy cập nhật thông tin ngân hàng.",
-                                        Toast.LENGTH_LONG).show();
+                                        "Lỗi đọc QR: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                             }
                         } else {
                             Toast.makeText(PaymentQrActivity.this,
@@ -102,7 +102,7 @@ public class PaymentQrActivity extends AppCompatActivity {
                     }
 
                     @Override
-                    public void onFailure(@NonNull Call<PaymentQrResponse> call, @NonNull Throwable t) {
+                    public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable t) {
                         binding.progressBar.setVisibility(View.GONE);
                         binding.ivQrCode.setImageResource(com.example.btck.R.drawable.ic_groups);
                         Toast.makeText(PaymentQrActivity.this,

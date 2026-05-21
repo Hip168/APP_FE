@@ -1,14 +1,19 @@
 package com.example.btck.activities;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Toast;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.example.btck.R;
 import com.example.btck.api.RetrofitClient;
 import com.example.btck.databinding.ActivityProfileBinding;
@@ -22,8 +27,18 @@ import com.example.btck.repository.UserRepository;
 import com.example.btck.viewmodel.AuthViewModel;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputEditText;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import android.os.Environment;
+import androidx.core.content.FileProvider;
+import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -36,7 +51,28 @@ public class ProfileActivity extends AppCompatActivity {
     private TokenManager tokenManager;
     private UserPublic currentUser;
     private List<BankInfo> bankList = new ArrayList<>();
-    private BankInfo selectedBankInfo = null; // Ngân hàng đang được chọn
+    private BankInfo selectedBankInfo = null;
+
+    // Tham chiếu đến avatar và chữ cái viết tắt trong Dialog (để update preview ngay khi chọn ảnh)
+    private android.widget.ImageView activeDialogAvatar = null;
+    private android.widget.TextView activeDialogAvatarInitial = null;
+
+    // Launcher chọn ảnh từ gallery
+    private final ActivityResultLauncher<String> pickImageLauncher =
+            registerForActivityResult(new ActivityResultContracts.GetContent(), uri -> {
+                if (uri != null) {
+                    uploadAvatar(uri);
+                }
+            });
+
+    // Launcher chụp ảnh bằng camera của điện thoại
+    private Uri cameraImageUri = null;
+    private final ActivityResultLauncher<Uri> takePictureLauncher =
+            registerForActivityResult(new ActivityResultContracts.TakePicture(), isSuccess -> {
+                if (isSuccess && cameraImageUri != null) {
+                    uploadAvatar(cameraImageUri);
+                }
+            });
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,6 +119,9 @@ public class ProfileActivity extends AppCompatActivity {
         binding.btnBankInfo.setOnClickListener(v -> showBankInfoDialog());
         binding.btnShowQr.setOnClickListener(v -> openQrScreen());
         binding.btnLogout.setOnClickListener(v -> showLogoutConfirm());
+        // Click vào avatar hoặc nút camera → chọn ảnh hoặc chụp ảnh mới
+        binding.btnEditAvatar.setOnClickListener(v -> showImageSourceOptions(v));
+        binding.cardAvatar.setOnClickListener(v -> showImageSourceOptions(v));
     }
 
     private void observeData() {
@@ -95,6 +134,10 @@ public class ProfileActivity extends AppCompatActivity {
                     binding.tvAvatarInitial.setText(
                             String.valueOf(user.getDisplayName().charAt(0)).toUpperCase());
                 }
+                // Hiển thị avatar nếu có
+                if (user.avatarUrl != null && !user.avatarUrl.isEmpty()) {
+                    showAvatarImage(user.avatarUrl);
+                }
             }
         });
 
@@ -103,17 +146,185 @@ public class ProfileActivity extends AppCompatActivity {
         });
     }
 
+    // ── Avatar ──────────────────────────────────────────────────────────────────
+    private void showAvatarImage(String url) {
+        binding.ivAvatar.setVisibility(View.VISIBLE);
+        binding.tvAvatarInitial.setVisibility(View.GONE);
+        Glide.with(this)
+                .load(url)
+                .diskCacheStrategy(DiskCacheStrategy.NONE)
+                .skipMemoryCache(true)
+                .circleCrop()
+                .placeholder(R.drawable.ic_groups)
+                .into(binding.ivAvatar);
+    }
+
+    private void uploadAvatar(Uri imageUri) {
+        try {
+            InputStream inputStream = getContentResolver().openInputStream(imageUri);
+            if (inputStream == null) {
+                Toast.makeText(this, "Không đọc được ảnh", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            byte[] bytes = inputStream.readAllBytes();
+            inputStream.close();
+
+            // Xác định MIME type
+            String mimeType = getContentResolver().getType(imageUri);
+            if (mimeType == null) mimeType = "image/jpeg";
+            String ext = mimeType.contains("png") ? ".png" : ".jpg";
+
+            RequestBody requestBody = RequestBody.create(bytes, MediaType.parse(mimeType));
+            MultipartBody.Part part = MultipartBody.Part.createFormData("file", "avatar" + ext, requestBody);
+
+            // Show preview ngay lập tức ở cả màn hình chính và dialog
+            binding.ivAvatar.setVisibility(View.VISIBLE);
+            binding.tvAvatarInitial.setVisibility(View.GONE);
+            Glide.with(this).load(imageUri).circleCrop().into(binding.ivAvatar);
+
+            if (activeDialogAvatar != null && activeDialogAvatarInitial != null) {
+                activeDialogAvatar.setVisibility(View.VISIBLE);
+                activeDialogAvatarInitial.setVisibility(View.GONE);
+                Glide.with(this).load(imageUri).circleCrop().into(activeDialogAvatar);
+            }
+
+            Toast.makeText(this, "Đang tải ảnh lên...", Toast.LENGTH_SHORT).show();
+
+            RetrofitClient.getApiService()
+                    .uploadAvatar(part)
+                    .enqueue(new Callback<UserPublic>() {
+                        @Override
+                        public void onResponse(@NonNull Call<UserPublic> call,
+                                               @NonNull Response<UserPublic> response) {
+                            if (response.isSuccessful() && response.body() != null) {
+                                currentUser = response.body();
+                                runOnUiThread(() -> {
+                                    Toast.makeText(ProfileActivity.this,
+                                            "✅ Cập nhật ảnh đại diện thành công!", Toast.LENGTH_SHORT).show();
+                                    if (currentUser.avatarUrl != null) {
+                                        showAvatarImage(currentUser.avatarUrl);
+                                        if (activeDialogAvatar != null && activeDialogAvatarInitial != null) {
+                                            Glide.with(ProfileActivity.this)
+                                                    .load(currentUser.avatarUrl)
+                                                    .diskCacheStrategy(DiskCacheStrategy.NONE)
+                                                    .skipMemoryCache(true)
+                                                    .circleCrop()
+                                                    .into(activeDialogAvatar);
+                                        }
+                                    }
+                                });
+                            } else {
+                                runOnUiThread(() ->
+                                        Toast.makeText(ProfileActivity.this,
+                                                "Tải ảnh thất bại. Thử lại sau.", Toast.LENGTH_SHORT).show());
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(@NonNull Call<UserPublic> call, @NonNull Throwable t) {
+                            runOnUiThread(() ->
+                                    Toast.makeText(ProfileActivity.this,
+                                            "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show());
+                        }
+                    });
+
+        } catch (Exception e) {
+            Toast.makeText(this, "Lỗi xử lý ảnh: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    // Hiển thị lựa chọn nguồn ảnh: Camera hoặc Thư viện dưới dạng PopupMenu tại vị trí vừa nhấn
+    private void showImageSourceOptions(View anchorView) {
+        android.widget.PopupMenu popup = new android.widget.PopupMenu(this, anchorView);
+        popup.getMenu().add(0, 1, 0, "📸 Chụp ảnh mới");
+        popup.getMenu().add(0, 2, 0, "🖼️ Chọn từ thư viện");
+
+        popup.setOnMenuItemClickListener(item -> {
+            if (item.getItemId() == 1) {
+                startCameraCapture();
+                return true;
+            } else if (item.getItemId() == 2) {
+                Toast.makeText(this, "Đang mở thư viện ảnh...", Toast.LENGTH_SHORT).show();
+                pickImageLauncher.launch("image/*");
+                return true;
+            }
+            return false;
+        });
+        popup.show();
+    }
+
+    // Khởi chạy camera để chụp hình
+    private void startCameraCapture() {
+        Toast.makeText(this, "Đang mở máy ảnh...", Toast.LENGTH_SHORT).show();
+        cameraImageUri = createCameraImageUri();
+        if (cameraImageUri != null) {
+            takePictureLauncher.launch(cameraImageUri);
+        }
+    }
+
+    // Tạo URI tạm thời để lưu ảnh chụp từ Camera thông qua FileProvider
+    private Uri createCameraImageUri() {
+        try {
+            File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+            if (storageDir == null) {
+                storageDir = new File(getFilesDir(), "Pictures");
+            }
+            if (!storageDir.exists()) {
+                storageDir.mkdirs();
+            }
+            String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
+            String imageFileName = "JPEG_" + timeStamp + "_";
+            File imageFile = File.createTempFile(imageFileName, ".jpg", storageDir);
+
+            return FileProvider.getUriForFile(
+                    this,
+                    getPackageName() + ".provider",
+                    imageFile
+            );
+        } catch (Exception e) {
+            Toast.makeText(this, "Không tạo được file ảnh: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            return null;
+        }
+    }
+
     // ── Edit Profile ────────────────────────────────────────────────────────────
     private void showEditProfileDialog() {
         View dialogView = getLayoutInflater().inflate(R.layout.dialog_edit_profile, null);
         TextInputEditText etName = dialogView.findViewById(R.id.etFullName);
+        android.widget.ImageView ivDialogAvatar = dialogView.findViewById(R.id.ivDialogAvatar);
+        android.widget.TextView tvDialogInitial = dialogView.findViewById(R.id.tvDialogAvatarInitial);
+        com.google.android.material.card.MaterialCardView btnDialogCamera =
+                dialogView.findViewById(R.id.btnDialogEditAvatar);
+        com.google.android.material.card.MaterialCardView cardDialogAvatar =
+                dialogView.findViewById(R.id.cardDialogAvatar);
 
-        if (currentUser != null) etName.setText(currentUser.getDisplayName());
+        // Lưu tham chiếu
+        activeDialogAvatar = ivDialogAvatar;
+        activeDialogAvatarInitial = tvDialogInitial;
 
-        new MaterialAlertDialogBuilder(this)
+        // Điền tên hiện tại
+        if (currentUser != null) {
+            etName.setText(currentUser.getDisplayName());
+            // Hiển thị avatar trong dialog
+            if (currentUser.avatarUrl != null && !currentUser.avatarUrl.isEmpty()) {
+                ivDialogAvatar.setVisibility(View.VISIBLE);
+                tvDialogInitial.setVisibility(View.GONE);
+                Glide.with(this).load(currentUser.avatarUrl).circleCrop().into(ivDialogAvatar);
+            } else if (currentUser.getDisplayName() != null) {
+                tvDialogInitial.setText(
+                        String.valueOf(currentUser.getDisplayName().charAt(0)).toUpperCase());
+            }
+        }
+
+        // Click avatar hoặc camera trong dialog → mở menu chọn nguồn ảnh (Camera hoặc Thư viện)
+        android.view.View.OnClickListener pickPhoto = v -> showImageSourceOptions(v);
+        btnDialogCamera.setOnClickListener(pickPhoto);
+        cardDialogAvatar.setOnClickListener(pickPhoto);
+
+        androidx.appcompat.app.AlertDialog dialog = new MaterialAlertDialogBuilder(this)
                 .setTitle("Chỉnh sửa hồ sơ")
                 .setView(dialogView)
-                .setPositiveButton("Lưu", (dialog, which) -> {
+                .setPositiveButton("Lưu", (d, which) -> {
                     String newName = etName.getText() != null
                             ? etName.getText().toString().trim() : "";
                     if (!newName.isEmpty()) {
@@ -139,7 +350,14 @@ public class ProfileActivity extends AppCompatActivity {
                     }
                 })
                 .setNegativeButton("Huỷ", null)
-                .show();
+                .create();
+
+        dialog.setOnDismissListener(d -> {
+            activeDialogAvatar = null;
+            activeDialogAvatarInitial = null;
+        });
+
+        dialog.show();
     }
 
     // ── Change Password ─────────────────────────────────────────────────────────
@@ -190,17 +408,14 @@ public class ProfileActivity extends AppCompatActivity {
         TextInputEditText etAccountNumber = dialogView.findViewById(R.id.etAccountNumber);
         TextInputEditText etAccountHolder = dialogView.findViewById(R.id.etAccountHolder);
 
-        // Reset selectedBankInfo
         selectedBankInfo = null;
 
-        // Pre-fill existing values
         if (currentUser != null) {
             if (currentUser.bankName != null)      spinnerBank.setText(currentUser.bankName, false);
             if (currentUser.accountNumber != null) etAccountNumber.setText(currentUser.accountNumber);
             if (currentUser.accountHolder != null) etAccountHolder.setText(currentUser.accountHolder);
         }
 
-        // Load bank list for dropdown
         if (bankList.isEmpty()) {
             RetrofitClient.getApiService().getBanks().enqueue(new Callback<BanksResponse>() {
                 @Override
@@ -213,9 +428,7 @@ public class ProfileActivity extends AppCompatActivity {
                     }
                 }
                 @Override
-                public void onFailure(@NonNull Call<BanksResponse> call, @NonNull Throwable t) {
-                    // Nếu API ngân hàng lỗi, người dùng vẫn có thể gõ tay
-                }
+                public void onFailure(@NonNull Call<BanksResponse> call, @NonNull Throwable t) {}
             });
         } else {
             populateBankDropdown(spinnerBank);
@@ -225,10 +438,9 @@ public class ProfileActivity extends AppCompatActivity {
                 .setTitle("🏦 Thông tin ngân hàng")
                 .setView(dialogView)
                 .setPositiveButton("Lưu", (dialog, which) -> {
-                    // Dùng selectedBankInfo nếu đã chọn từ dropdown, ngược lại dùng text gõ tay
                     String bankCode = "";
                     if (selectedBankInfo != null) {
-                        bankCode = selectedBankInfo.getDisplayName(); // shortName hoặc code
+                        bankCode = selectedBankInfo.getDisplayName();
                     } else if (spinnerBank.getText() != null) {
                         bankCode = spinnerBank.getText().toString().trim();
                     }
@@ -276,7 +488,6 @@ public class ProfileActivity extends AppCompatActivity {
                 this, android.R.layout.simple_dropdown_item_1line, names);
         spinner.setAdapter(adapter);
 
-        // Khi người dùng chọn từ danh sách, lưu lại đối tượng BankInfo tương ứng
         spinner.setOnItemClickListener((parent, view, position, id) -> {
             String selectedString = (String) parent.getItemAtPosition(position);
             for (BankInfo b : bankList) {
@@ -301,7 +512,7 @@ public class ProfileActivity extends AppCompatActivity {
         }
         Intent intent = new Intent(this, PaymentQrActivity.class);
         intent.putExtra("user_id",        currentUser.id);
-        intent.putExtra("amount",         0);
+        intent.putExtra("amount",         0L);
         intent.putExtra("description",    "Thanh toan chia tien");
         intent.putExtra("bank_name",      currentUser.bankName);
         intent.putExtra("account_number", currentUser.accountNumber);
