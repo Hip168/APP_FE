@@ -21,20 +21,15 @@
             android:orientation="vertical"
             android:gravity="center">
 
-            <View
-                android:layout_width="64dp"
-                android:layout_height="64dp"
-                android:background="@drawable/bg_mint_circle" />
-
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:text="Chào mừng trở lại!"
+                android:text="Chào mừng bạn đến với Splitmate"
                 android:textColor="@color/text_dark"
-                android:textSize="26sp"
+                android:textSize="24sp"
                 android:textStyle="bold"
-                android:fontFamily="@font/inter_bold" />
+                android:fontFamily="@font/inter_bold"
+                android:gravity="center" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -93,19 +88,6 @@
                 android:textColor="@color/text_dark" />
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- Forgot Password -->
-        <TextView
-            android:id="@+id/tvForgotPassword"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="end"
-            android:layout_marginBottom="28dp"
-            android:text="Quên mật khẩu?"
-            android:textColor="@color/mint_dark"
-            android:textSize="14sp"
-            android:textStyle="bold"
-            android:clickable="true"
-            android:focusable="true" />
 
         <!-- Login Button -->
         <com.google.android.material.button.MaterialButton

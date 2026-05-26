@@ -94,7 +94,7 @@ public class MainActivity extends AppCompatActivity {
 
                     @Override
                     public void onFailure(@NonNull Call<MessageResponse> call, @NonNull Throwable t) {
-                        Log.e("MainActivity", "Lỗi mạng");
+                        Log.e("MainActivity", "Không kết nối được máy chủ");
                     }
                 });
     }
@@ -131,7 +131,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(@NonNull Call<com.example.btck.models.UnreadCountResponse> call, @NonNull Throwable t) {
-                Log.e("MainActivity", "Lỗi mạng");
+                Log.e("MainActivity", "Không kết nối được máy chủ");
             }
         });
     }

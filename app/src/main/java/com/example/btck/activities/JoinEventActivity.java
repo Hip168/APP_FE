@@ -10,6 +10,7 @@ import com.example.btck.databinding.ActivityJoinEventBinding;
 import com.example.btck.models.EventMemberPublic;
 import com.example.btck.managers.TokenManager;
 import com.example.btck.utils.InviteCodeUtils;
+import com.example.btck.utils.ErrorUtils;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -78,9 +79,9 @@ public class JoinEventActivity extends AppCompatActivity {
                         binding.btnJoin.setEnabled(true);
                         if (response.isSuccessful() && response.body() != null) {
                             binding.tvStatus.setVisibility(View.VISIBLE);
-                            binding.tvStatus.setText("✅ Tham gia nhóm thành công!");
+                            binding.tvStatus.setText("Tham gia nhóm thành công!");
                             binding.tvStatus.setTextColor(getColor(com.example.btck.R.color.color_owed));
-
+ 
                             // Quay về MainActivity sau 1.5 giây
                             binding.getRoot().postDelayed(() -> {
                                 Intent mainIntent = new Intent(JoinEventActivity.this, MainActivity.class);
@@ -90,9 +91,9 @@ public class JoinEventActivity extends AppCompatActivity {
                             }, 1500);
                         } else {
                             // Parse lỗi thực từ backend thay vì hardcode message
-                            String errorMsg = parseErrorDetail(response);
+                            String errorMsg = ErrorUtils.parseError(response);
                             binding.tvStatus.setVisibility(View.VISIBLE);
-                            binding.tvStatus.setText("❌ " + errorMsg);
+                            binding.tvStatus.setText(errorMsg);
                             binding.tvStatus.setTextColor(getColor(com.example.btck.R.color.color_owe));
                         }
                     }
@@ -102,34 +103,8 @@ public class JoinEventActivity extends AppCompatActivity {
                         binding.progressBar.setVisibility(View.GONE);
                         binding.btnJoin.setEnabled(true);
                         Toast.makeText(JoinEventActivity.this,
-                                "Lỗi mạng", Toast.LENGTH_SHORT).show();
+                                "Không kết nối được máy chủ", Toast.LENGTH_SHORT).show();
                     }
                 });
-    }
-
-    /** Đọc field "detail" từ error body của backend */
-    private String parseErrorDetail(retrofit2.Response<?> response) {
-        try {
-            if (response.errorBody() != null) {
-                String raw = response.errorBody().string();
-                // Parse thủ công để tránh phụ thuộc thêm thư viện
-                org.json.JSONObject json = new org.json.JSONObject(raw);
-                if (json.has("detail")) {
-                    String detail = json.getString("detail");
-                    // Dịch các message phổ biến sang tiếng Việt
-                    switch (detail) {
-                        case "Invalid or expired invite code":
-                            return "Mã mời không hợp lệ hoặc đã hết hạn";
-                        case "Already a member of this event":
-                            return "Bạn đã là thành viên của nhóm này rồi";
-                        case "Event not found":
-                            return "Không tìm thấy nhóm";
-                        default:
-                            return detail; // Hiển thị nguyên văn nếu chưa có bản dịch
-                    }
-                }
-            }
-        } catch (Exception ignored) {}
-        return "Tham gia thất bại (lỗi " + response.code() + ")";
     }
 }

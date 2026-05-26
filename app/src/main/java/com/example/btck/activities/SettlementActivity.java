@@ -108,7 +108,7 @@ public class SettlementActivity extends AppCompatActivity {
 
     private void updateDebtSummary() {
         if (debtList.isEmpty()) {
-            binding.tvDebtSummary.setText("✅ Tất cả đã thanh toán!");
+            binding.tvDebtSummary.setText("Tất cả đã thanh toán!");
             binding.tvDebtSummary.setTextColor(getColor(com.example.btck.R.color.color_owed));
         } else {
             StringBuilder sb = new StringBuilder("Cần thanh toán:\n");
@@ -136,6 +136,7 @@ public class SettlementActivity extends AppCompatActivity {
         android.widget.Spinner spFrom = dialogView.findViewById(com.example.btck.R.id.spinnerFrom);
         android.widget.Spinner spTo = dialogView.findViewById(com.example.btck.R.id.spinnerTo);
         android.widget.EditText etAmount = dialogView.findViewById(com.example.btck.R.id.etSettleAmount);
+        etAmount.addTextChangedListener(new com.example.btck.utils.CurrencyTextWatcher(etAmount));
         android.widget.EditText etNote = dialogView.findViewById(com.example.btck.R.id.etNote);
 
         android.widget.ArrayAdapter<String> adapter = new android.widget.ArrayAdapter<>(
@@ -186,7 +187,7 @@ public class SettlementActivity extends AppCompatActivity {
                     if (amtStr.isEmpty()) { Toast.makeText(this, "Nhập số tiền", Toast.LENGTH_SHORT).show(); return; }
 
                     long amt;
-                    try { amt = Long.parseLong(amtStr); } catch (Exception e) { return; }
+                    try { amt = Long.parseLong(amtStr.replaceAll("[.]", "")); } catch (Exception e) { return; }
                     settlementViewModel.createSettlement(eventId, fromId, toId, amt, note.isEmpty() ? null : note);
                 })
                 .setNegativeButton("Huỷ", null)

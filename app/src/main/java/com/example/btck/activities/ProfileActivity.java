@@ -213,7 +213,7 @@ public class ProfileActivity extends AppCompatActivity {
                                 currentUser = response.body();
                                 runOnUiThread(() -> {
                                     Toast.makeText(ProfileActivity.this,
-                                            "✅ Cập nhật ảnh đại diện thành công!", Toast.LENGTH_SHORT).show();
+                                            "Cập nhật ảnh đại diện thành công!", Toast.LENGTH_SHORT).show();
                                     if (currentUser.avatarUrl != null) {
                                         showAvatarImage(currentUser.avatarUrl);
                                         if (activeDialogAvatar != null && activeDialogAvatarInitial != null) {
@@ -237,7 +237,7 @@ public class ProfileActivity extends AppCompatActivity {
                         public void onFailure(@NonNull Call<UserPublic> call, @NonNull Throwable t) {
                             runOnUiThread(() ->
                                     Toast.makeText(ProfileActivity.this,
-                                            "Lỗi mạng", Toast.LENGTH_SHORT).show());
+                                            "Không kết nối được máy chủ", Toast.LENGTH_SHORT).show());
                         }
                     });
 
@@ -249,7 +249,7 @@ public class ProfileActivity extends AppCompatActivity {
     // Hiển thị lựa chọn nguồn ảnh: Camera hoặc Thư viện dưới dạng Dialog
     private void showImageSourceOptions(View anchorView) {
         new com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
-                .setTitle("📷 Chọn nguồn ảnh đại diện")
+                .setTitle("Chọn nguồn ảnh đại diện")
                 .setItems(new String[]{"Dùng Camera", "Chọn từ Thư viện"}, (dialog, which) -> {
                     if (which == 0) {
                         // Camera
@@ -452,7 +452,7 @@ public class ProfileActivity extends AppCompatActivity {
         }
 
         new MaterialAlertDialogBuilder(this)
-                .setTitle("🏦 Thông tin ngân hàng")
+                .setTitle("Thông tin ngân hàng")
                 .setView(dialogView)
                 .setPositiveButton("Lưu", (dialog, which) -> {
                     String bankCode = "";
@@ -482,7 +482,7 @@ public class ProfileActivity extends AppCompatActivity {
                             currentUser = user;
                             runOnUiThread(() ->
                                     Toast.makeText(ProfileActivity.this,
-                                            "✅ Đã lưu thông tin ngân hàng!", Toast.LENGTH_SHORT).show());
+                                            "Đã lưu thông tin ngân hàng!", Toast.LENGTH_SHORT).show());
                         }
                         @Override
                         public void onError(String message) {

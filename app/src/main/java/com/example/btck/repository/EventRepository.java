@@ -4,6 +4,7 @@ import androidx.lifecycle.MutableLiveData;
 import com.example.btck.api.ApiService;
 import com.example.btck.api.RetrofitClient;
 import com.example.btck.models.*;
+import com.example.btck.utils.ErrorUtils;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -23,10 +24,10 @@ public class EventRepository {
             @Override
             public void onResponse(Call<EventsPublic> call, Response<EventsPublic> response) {
                 if (response.isSuccessful() && response.body() != null) onSuccess.postValue(response.body());
-                else onError.postValue(parseError(response));
+                else onError.postValue(ErrorUtils.parseError(response));
             }
             @Override
-            public void onFailure(Call<EventsPublic> call, Throwable t) { onError.postValue("Lỗi mạng"); }
+            public void onFailure(Call<EventsPublic> call, Throwable t) { onError.postValue("Không kết nối được máy chủ"); }
         });
     }
 
@@ -37,10 +38,10 @@ public class EventRepository {
             @Override
             public void onResponse(Call<EventPublic> call, Response<EventPublic> response) {
                 if (response.isSuccessful() && response.body() != null) onSuccess.postValue(response.body());
-                else onError.postValue(parseError(response));
+                else onError.postValue(ErrorUtils.parseError(response));
             }
             @Override
-            public void onFailure(Call<EventPublic> call, Throwable t) { onError.postValue("Lỗi mạng"); }
+            public void onFailure(Call<EventPublic> call, Throwable t) { onError.postValue("Không kết nối được máy chủ"); }
         });
     }
 
@@ -51,10 +52,10 @@ public class EventRepository {
             @Override
             public void onResponse(Call<EventPublic> call, Response<EventPublic> response) {
                 if (response.isSuccessful() && response.body() != null) onSuccess.postValue(response.body());
-                else onError.postValue(parseError(response));
+                else onError.postValue(ErrorUtils.parseError(response));
             }
             @Override
-            public void onFailure(Call<EventPublic> call, Throwable t) { onError.postValue("Lỗi mạng"); }
+            public void onFailure(Call<EventPublic> call, Throwable t) { onError.postValue("Không kết nối được máy chủ"); }
         });
     }
 
@@ -65,10 +66,10 @@ public class EventRepository {
             @Override
             public void onResponse(Call<MessageResponse> call, Response<MessageResponse> response) {
                 if (response.isSuccessful()) onSuccess.postValue(true);
-                else onError.postValue(parseError(response));
+                else onError.postValue(ErrorUtils.parseError(response));
             }
             @Override
-            public void onFailure(Call<MessageResponse> call, Throwable t) { onError.postValue("Lỗi mạng"); }
+            public void onFailure(Call<MessageResponse> call, Throwable t) { onError.postValue("Không kết nối được máy chủ"); }
         });
     }
 
@@ -79,10 +80,10 @@ public class EventRepository {
             @Override
             public void onResponse(Call<EventMemberPublic> call, Response<EventMemberPublic> response) {
                 if (response.isSuccessful() && response.body() != null) onSuccess.postValue(response.body());
-                else onError.postValue(parseError(response));
+                else onError.postValue(ErrorUtils.parseError(response));
             }
             @Override
-            public void onFailure(Call<EventMemberPublic> call, Throwable t) { onError.postValue("Lỗi mạng"); }
+            public void onFailure(Call<EventMemberPublic> call, Throwable t) { onError.postValue("Không kết nối được máy chủ"); }
         });
     }
 
@@ -93,10 +94,10 @@ public class EventRepository {
             @Override
             public void onResponse(Call<EventBalances> call, Response<EventBalances> response) {
                 if (response.isSuccessful() && response.body() != null) onSuccess.postValue(response.body());
-                else onError.postValue(parseError(response));
+                else onError.postValue(ErrorUtils.parseError(response));
             }
             @Override
-            public void onFailure(Call<EventBalances> call, Throwable t) { onError.postValue("Lỗi mạng"); }
+            public void onFailure(Call<EventBalances> call, Throwable t) { onError.postValue("Không kết nối được máy chủ"); }
         });
     }
 
@@ -107,10 +108,10 @@ public class EventRepository {
             @Override
             public void onResponse(Call<SimplifiedDebtsResponse> call, Response<SimplifiedDebtsResponse> response) {
                 if (response.isSuccessful() && response.body() != null) onSuccess.postValue(response.body());
-                else onError.postValue(parseError(response));
+                else onError.postValue(ErrorUtils.parseError(response));
             }
             @Override
-            public void onFailure(Call<SimplifiedDebtsResponse> call, Throwable t) { onError.postValue("Lỗi mạng"); }
+            public void onFailure(Call<SimplifiedDebtsResponse> call, Throwable t) { onError.postValue("Không kết nối được máy chủ"); }
         });
     }
 
@@ -121,10 +122,10 @@ public class EventRepository {
             @Override
             public void onResponse(Call<EventStats> call, Response<EventStats> response) {
                 if (response.isSuccessful() && response.body() != null) onSuccess.postValue(response.body());
-                else onError.postValue(parseError(response));
+                else onError.postValue(ErrorUtils.parseError(response));
             }
             @Override
-            public void onFailure(Call<EventStats> call, Throwable t) { onError.postValue("Lỗi mạng"); }
+            public void onFailure(Call<EventStats> call, Throwable t) { onError.postValue("Không kết nối được máy chủ"); }
         });
     }
 
@@ -133,10 +134,10 @@ public class EventRepository {
             @Override
             public void onResponse(Call<MyBalanceDetail> call, Response<MyBalanceDetail> response) {
                 if (response.isSuccessful() && response.body() != null) onSuccess.postValue(response.body());
-                else onError.postValue(parseError(response));
+                else onError.postValue(ErrorUtils.parseError(response));
             }
             @Override
-            public void onFailure(Call<MyBalanceDetail> call, Throwable t) { onError.postValue("Lỗi mạng"); }
+            public void onFailure(Call<MyBalanceDetail> call, Throwable t) { onError.postValue("Không kết nối được máy chủ"); }
         });
     }
 
@@ -147,10 +148,10 @@ public class EventRepository {
             @Override
             public void onResponse(Call<InviteCodePublic> call, Response<InviteCodePublic> response) {
                 if (response.isSuccessful() && response.body() != null) onSuccess.postValue(response.body());
-                else onError.postValue(parseError(response));
+                else onError.postValue(ErrorUtils.parseError(response));
             }
             @Override
-            public void onFailure(Call<InviteCodePublic> call, Throwable t) { onError.postValue("Lỗi mạng"); }
+            public void onFailure(Call<InviteCodePublic> call, Throwable t) { onError.postValue("Không kết nối được máy chủ"); }
         });
     }
 
@@ -161,22 +162,10 @@ public class EventRepository {
             @Override
             public void onResponse(Call<EventMemberPublic> call, Response<EventMemberPublic> response) {
                 if (response.isSuccessful() && response.body() != null) onSuccess.postValue(response.body());
-                else onError.postValue(parseError(response));
+                else onError.postValue(ErrorUtils.parseError(response));
             }
             @Override
-            public void onFailure(Call<EventMemberPublic> call, Throwable t) { onError.postValue("Lỗi mạng"); }
+            public void onFailure(Call<EventMemberPublic> call, Throwable t) { onError.postValue("Không kết nối được máy chủ"); }
         });
-    }
-
-    private String parseError(Response<?> response) {
-        try {
-            String body = response.errorBody() != null ? response.errorBody().string() : "";
-            if (body.contains("\"detail\":\"")) {
-                int s = body.indexOf("\"detail\":\"") + 10;
-                int e = body.indexOf("\"", s);
-                if (e > s) return body.substring(s, e);
-            }
-            return "Lỗi: " + response.code();
-        } catch (Exception e) { return "Lỗi không xác định"; }
     }
 }

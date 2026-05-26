@@ -44,11 +44,25 @@ public class ForgotPasswordActivity extends AppCompatActivity {
 
         binding.btnSend.setOnClickListener(v -> {
             String email = binding.etEmail.getText().toString().trim();
+            binding.tilEmail.setError(null);
+
             if (TextUtils.isEmpty(email)) {
                 binding.tilEmail.setError("Vui lòng nhập email");
                 return;
             }
-            binding.tilEmail.setError(null);
+            if (email.contains(" ")) {
+                binding.tilEmail.setError("Email không được chứa khoảng trắng");
+                return;
+            }
+            if (!email.contains("@")) {
+                binding.tilEmail.setError("Email thiếu ký tự @");
+                return;
+            }
+            if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                binding.tilEmail.setError("Email không đúng định dạng (VD: example@email.com)");
+                return;
+            }
+
             binding.progressBar.setVisibility(View.VISIBLE);
             binding.btnSend.setEnabled(false);
             viewModel.recoverPassword(email);

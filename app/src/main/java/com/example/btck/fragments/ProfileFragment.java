@@ -215,7 +215,7 @@ public class ProfileFragment extends Fragment {
 
     private void showImageSourceOptions(android.view.View anchorView) {
         new com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
-                .setTitle("📷 Chọn nguồn ảnh đại diện")
+                .setTitle("Chọn nguồn ảnh đại diện")
                 .setItems(new String[]{"Dùng Camera", "Chọn từ Thư viện"}, (dialog, which) -> {
                     if (which == 0) {
                         // Camera
@@ -305,7 +305,7 @@ public class ProfileFragment extends Fragment {
                                 currentUser = response.body();
                                 requireActivity().runOnUiThread(() -> {
                                     Toast.makeText(requireContext(),
-                                            "✅ Cập nhật ảnh đại diện thành công!", Toast.LENGTH_SHORT).show();
+                                            "Cập nhật ảnh đại diện thành công!", Toast.LENGTH_SHORT).show();
                                     if (currentUser.avatarUrl != null) {
                                         showAvatarImage(currentUser.avatarUrl);
                                         if (activeDialogAvatar != null && activeDialogAvatarInitial != null) {
@@ -330,7 +330,7 @@ public class ProfileFragment extends Fragment {
                             if (!isAdded() || getActivity() == null) return;
                             requireActivity().runOnUiThread(() ->
                                     Toast.makeText(requireContext(),
-                                            "Lỗi mạng", Toast.LENGTH_SHORT).show());
+                                            "Không kết nối được máy chủ", Toast.LENGTH_SHORT).show());
                         }
                     });
 
@@ -420,7 +420,7 @@ public class ProfileFragment extends Fragment {
         }
 
         new MaterialAlertDialogBuilder(requireContext())
-                .setTitle("🏦 Thông tin ngân hàng")
+                .setTitle("Thông tin ngân hàng")
                 .setView(dialogView)
                 .setPositiveButton("Lưu", (dialog, which) -> {
                     String bankCode = "";
@@ -450,7 +450,7 @@ public class ProfileFragment extends Fragment {
                             currentUser = user;
                             if (isAdded() && getActivity() != null) {
                                 getActivity().runOnUiThread(() ->
-                                        Toast.makeText(requireContext(), "✅ Đã lưu thông tin ngân hàng!", Toast.LENGTH_SHORT).show());
+                                        Toast.makeText(requireContext(), "Đã lưu thông tin ngân hàng!", Toast.LENGTH_SHORT).show());
                             }
                         }
                         @Override

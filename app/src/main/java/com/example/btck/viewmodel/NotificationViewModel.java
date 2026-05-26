@@ -8,6 +8,7 @@ import com.example.btck.api.RetrofitClient;
 import com.example.btck.models.MessageResponse;
 import com.example.btck.models.NotificationPublic;
 import com.example.btck.models.NotificationsPublic;
+import com.example.btck.utils.ErrorUtils;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -31,11 +32,11 @@ public class NotificationViewModel extends AndroidViewModel {
                     public void onResponse(@NonNull Call<NotificationsPublic> call,
                                            @NonNull Response<NotificationsPublic> response) {
                         if (response.isSuccessful()) notifications.postValue(response.body());
-                        else errorMessage.postValue("Lỗi tải thông báo: " + response.code());
+                        else errorMessage.postValue(ErrorUtils.parseError(response));
                     }
                     @Override
                     public void onFailure(@NonNull Call<NotificationsPublic> call, @NonNull Throwable t) {
-                        errorMessage.postValue("Lỗi mạng");
+                        errorMessage.postValue("Không kết nối được máy chủ");
                     }
                 });
     }
@@ -48,10 +49,11 @@ public class NotificationViewModel extends AndroidViewModel {
                     public void onResponse(@NonNull Call<NotificationPublic> call,
                                            @NonNull Response<NotificationPublic> response) {
                         if (response.isSuccessful()) markedRead.postValue(response.body());
+                        else errorMessage.postValue(ErrorUtils.parseError(response));
                     }
                     @Override
                     public void onFailure(@NonNull Call<NotificationPublic> call, @NonNull Throwable t) {
-                        errorMessage.postValue("Lỗi mạng");
+                        errorMessage.postValue("Không kết nối được máy chủ");
                     }
                 });
     }
@@ -63,11 +65,12 @@ public class NotificationViewModel extends AndroidViewModel {
                     @Override
                     public void onResponse(@NonNull Call<MessageResponse> call,
                                            @NonNull Response<MessageResponse> response) {
-                        markedAllRead.postValue(response.isSuccessful());
+                        if (response.isSuccessful()) markedAllRead.postValue(response.isSuccessful());
+                        else errorMessage.postValue(ErrorUtils.parseError(response));
                     }
                     @Override
                     public void onFailure(@NonNull Call<MessageResponse> call, @NonNull Throwable t) {
-                        errorMessage.postValue("Lỗi mạng");
+                        errorMessage.postValue("Không kết nối được máy chủ");
                     }
                 });
     }

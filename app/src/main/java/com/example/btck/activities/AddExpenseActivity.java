@@ -57,7 +57,7 @@ public class AddExpenseActivity extends AppCompatActivity {
                 if (success && photoFile != null) {
                     binding.ivReceiptPreview.setImageURI(photoUri);
                     binding.ivReceiptPreview.setVisibility(View.VISIBLE);
-                    Toast.makeText(this, "✅ Đã chụp ảnh hoá đơn", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Đã chụp ảnh hoá đơn", Toast.LENGTH_SHORT).show();
                     runOCR(photoUri);
                 }
             });
@@ -158,6 +158,7 @@ public class AddExpenseActivity extends AppCompatActivity {
             recalculateSplits();
         });
 
+        binding.etAmount.addTextChangedListener(new com.example.btck.utils.CurrencyTextWatcher(binding.etAmount));
         binding.etAmount.addTextChangedListener(new TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
             @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
@@ -236,7 +237,7 @@ public class AddExpenseActivity extends AppCompatActivity {
 
     private void showImageOptions() {
         new com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
-                .setTitle("📷 Chụp ảnh hoá đơn")
+                .setTitle("Chụp ảnh hoá đơn")
                 .setItems(new String[]{"Dùng Camera", "Chọn từ Thư viện"}, (dialog, which) -> {
                     if (which == 0) {
                         // Camera

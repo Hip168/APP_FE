@@ -82,6 +82,13 @@ public class ExpenseDetailActivity extends AppCompatActivity {
             binding.tvNoReceipt.setVisibility(View.VISIBLE);
         }
 
+        binding.btnGoToSimplified.setOnClickListener(v -> {
+            android.content.Intent intent = new android.content.Intent(this, GroupDetailActivity.class);
+            intent.putExtra("event_id", eventId);
+            intent.putExtra("target_tab", 2); // 2 is the index of "Đơn giản hóa" (Simplified) tab
+            startActivity(intent);
+        });
+
         binding.btnDelete.setOnClickListener(v -> {
             new com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
                     .setTitle("Xoá chi tiêu")

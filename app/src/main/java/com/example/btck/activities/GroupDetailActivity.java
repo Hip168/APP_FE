@@ -65,6 +65,13 @@ public class GroupDetailActivity extends AppCompatActivity {
         setupToolbar();
         setupRecyclerView();
         setupTabs();
+        int targetTab = getIntent().getIntExtra("target_tab", 0);
+        if (targetTab > 0 && targetTab < binding.tabLayout.getTabCount()) {
+            com.google.android.material.tabs.TabLayout.Tab tab = binding.tabLayout.getTabAt(targetTab);
+            if (tab != null) {
+                tab.select();
+            }
+        }
         observeData();
         loadData();
     }
@@ -525,6 +532,19 @@ public class GroupDetailActivity extends AppCompatActivity {
         intent.putExtra("user_id", debt.toUserId);
         intent.putExtra("amount", debt.amount);
         intent.putExtra("description", "Thanh toan " + eventName);
+
+        // Retrieve and pass recipient's bank details from eventBalances
+        if (eventViewModel.eventBalances.getValue() != null && eventViewModel.eventBalances.getValue().balances != null) {
+            for (UserBalance balance : eventViewModel.eventBalances.getValue().balances) {
+                if (balance.userId != null && balance.userId.equals(debt.toUserId)) {
+                    intent.putExtra("bank_name", balance.bankName);
+                    intent.putExtra("account_number", balance.accountNumber);
+                    intent.putExtra("account_holder", balance.accountHolder);
+                    break;
+                }
+            }
+        }
+
         startActivity(intent);
     }
 

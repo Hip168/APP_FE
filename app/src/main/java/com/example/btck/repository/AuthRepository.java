@@ -4,6 +4,7 @@ import androidx.lifecycle.MutableLiveData;
 import com.example.btck.api.ApiService;
 import com.example.btck.api.RetrofitClient;
 import com.example.btck.models.*;
+import com.example.btck.utils.ErrorUtils;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -25,12 +26,12 @@ public class AuthRepository {
                 if (response.isSuccessful() && response.body() != null) {
                     onSuccess.postValue(response.body());
                 } else {
-                    onError.postValue(parseError(response));
+                    onError.postValue(ErrorUtils.parseError(response));
                 }
             }
             @Override
             public void onFailure(Call<TokenResponse> call, Throwable t) {
-                onError.postValue("Lỗi mạng");
+                onError.postValue("Không kết nối được máy chủ");
             }
         });
     }
@@ -45,12 +46,12 @@ public class AuthRepository {
                 if (response.isSuccessful() && response.body() != null) {
                     onSuccess.postValue(response.body());
                 } else {
-                    onError.postValue(parseError(response));
+                    onError.postValue(ErrorUtils.parseError(response));
                 }
             }
             @Override
             public void onFailure(Call<UserPublic> call, Throwable t) {
-                onError.postValue("Lỗi mạng");
+                onError.postValue("Không kết nối được máy chủ");
             }
         });
     }
@@ -64,12 +65,12 @@ public class AuthRepository {
                 if (response.isSuccessful() && response.body() != null) {
                     onSuccess.postValue(response.body());
                 } else {
-                    onError.postValue(parseError(response));
+                    onError.postValue(ErrorUtils.parseError(response));
                 }
             }
             @Override
             public void onFailure(Call<MessageResponse> call, Throwable t) {
-                onError.postValue("Lỗi mạng");
+                onError.postValue("Không kết nối được máy chủ");
             }
         });
     }
@@ -81,34 +82,13 @@ public class AuthRepository {
                 if (response.isSuccessful() && response.body() != null) {
                     onSuccess.postValue(response.body());
                 } else {
-                    onError.postValue(parseError(response));
+                    onError.postValue(ErrorUtils.parseError(response));
                 }
             }
             @Override
             public void onFailure(Call<UserPublic> call, Throwable t) {
-                onError.postValue("Lỗi mạng");
+                onError.postValue("Không kết nối được máy chủ");
             }
         });
-    }
-
-    private String parseError(Response<?> response) {
-        try {
-            String errorBody = response.errorBody() != null ? response.errorBody().string() : "";
-            if (errorBody.contains("detail")) {
-                // Try to extract detail message
-                int start = errorBody.indexOf("\"detail\":\"") + 10;
-                if (start > 9) {
-                    int end = errorBody.indexOf("\"", start);
-                    if (end > start) return errorBody.substring(start, end);
-                }
-            }
-            if (response.code() == 400) return "Email hoặc mật khẩu không đúng";
-            if (response.code() == 401) return "Phiên đăng nhập hết hạn";
-            if (response.code() == 404) return "Không tìm thấy";
-            if (response.code() == 422) return "Dữ liệu không hợp lệ";
-            return "Lỗi: " + response.code();
-        } catch (Exception e) {
-            return "Lỗi không xác định";
-        }
     }
 }

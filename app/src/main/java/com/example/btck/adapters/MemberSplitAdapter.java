@@ -104,7 +104,7 @@ public class MemberSplitAdapter extends RecyclerView.Adapter<MemberSplitAdapter.
                 @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
                 @Override public void afterTextChanged(Editable s) {
                     if (equalSplitMode) return;
-                    try { item.amountOwed = Long.parseLong(s.toString()); }
+                    try { item.amountOwed = Long.parseLong(s.toString().replaceAll("[.]", "")); }
                     catch (NumberFormatException e) { item.amountOwed = 0; }
                 }
             };

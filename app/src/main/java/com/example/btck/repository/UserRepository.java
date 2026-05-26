@@ -4,6 +4,7 @@ import androidx.lifecycle.MutableLiveData;
 import com.example.btck.api.ApiService;
 import com.example.btck.api.RetrofitClient;
 import com.example.btck.models.*;
+import com.example.btck.utils.ErrorUtils;
 import java.util.List;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -37,10 +38,10 @@ public class UserRepository {
             @Override public void onResponse(Call<UserPublic> call, Response<UserPublic> response) {
                 if (response.isSuccessful() && response.body() != null)
                     callback.onSuccess(response.body());
-                else callback.onError(parseError(response));
+                else callback.onError(ErrorUtils.parseError(response));
             }
             @Override public void onFailure(Call<UserPublic> call, Throwable t) {
-                callback.onError("Lỗi mạng");
+                callback.onError("Không kết nối được máy chủ");
             }
         });
     }
@@ -49,10 +50,10 @@ public class UserRepository {
         api.updatePassword(body).enqueue(new Callback<MessageResponse>() {
             @Override public void onResponse(Call<MessageResponse> call, Response<MessageResponse> response) {
                 if (response.isSuccessful()) callback.onSuccess();
-                else callback.onError(parseError(response));
+                else callback.onError(ErrorUtils.parseError(response));
             }
             @Override public void onFailure(Call<MessageResponse> call, Throwable t) {
-                callback.onError("Lỗi mạng");
+                callback.onError("Không kết nối được máy chủ");
             }
         });
     }
@@ -63,9 +64,9 @@ public class UserRepository {
         api.updateMe(body).enqueue(new Callback<UserPublic>() {
             @Override public void onResponse(Call<UserPublic> call, Response<UserPublic> response) {
                 if (response.isSuccessful() && response.body() != null) onSuccess.postValue(response.body());
-                else onError.postValue(parseError(response));
+                else onError.postValue(ErrorUtils.parseError(response));
             }
-            @Override public void onFailure(Call<UserPublic> call, Throwable t) { onError.postValue("Lỗi mạng"); }
+            @Override public void onFailure(Call<UserPublic> call, Throwable t) { onError.postValue("Không kết nối được máy chủ"); }
         });
     }
 
@@ -74,9 +75,9 @@ public class UserRepository {
         api.updatePassword(body).enqueue(new Callback<MessageResponse>() {
             @Override public void onResponse(Call<MessageResponse> call, Response<MessageResponse> response) {
                 if (response.isSuccessful()) onSuccess.postValue(true);
-                else onError.postValue(parseError(response));
+                else onError.postValue(ErrorUtils.parseError(response));
             }
-            @Override public void onFailure(Call<MessageResponse> call, Throwable t) { onError.postValue("Lỗi mạng"); }
+            @Override public void onFailure(Call<MessageResponse> call, Throwable t) { onError.postValue("Không kết nối được máy chủ"); }
         });
     }
 
@@ -85,9 +86,9 @@ public class UserRepository {
         api.searchUsers(email).enqueue(new Callback<List<UserPublic>>() {
             @Override public void onResponse(Call<List<UserPublic>> call, Response<List<UserPublic>> response) {
                 if (response.isSuccessful() && response.body() != null) onSuccess.postValue(response.body());
-                else onError.postValue(parseError(response));
+                else onError.postValue(ErrorUtils.parseError(response));
             }
-            @Override public void onFailure(Call<List<UserPublic>> call, Throwable t) { onError.postValue("Lỗi mạng"); }
+            @Override public void onFailure(Call<List<UserPublic>> call, Throwable t) { onError.postValue("Không kết nối được máy chủ"); }
         });
     }
 
@@ -95,21 +96,10 @@ public class UserRepository {
         api.registerFcmToken(new FCMTokenRequest(fcmToken, "android")).enqueue(new Callback<MessageResponse>() {
             @Override public void onResponse(Call<MessageResponse> call, Response<MessageResponse> response) {
                 if (response.isSuccessful()) onSuccess.postValue(true);
-                else onError.postValue(parseError(response));
+                else onError.postValue(ErrorUtils.parseError(response));
             }
-            @Override public void onFailure(Call<MessageResponse> call, Throwable t) { onError.postValue("Lỗi mạng"); }
+            @Override public void onFailure(Call<MessageResponse> call, Throwable t) { onError.postValue("Không kết nối được máy chủ"); }
         });
     }
 
-    private String parseError(Response<?> response) {
-        try {
-            String body = response.errorBody() != null ? response.errorBody().string() : "";
-            if (body.contains("\"detail\":\"")) {
-                int s = body.indexOf("\"detail\":\"") + 10;
-                int e = body.indexOf("\"", s);
-                if (e > s) return body.substring(s, e);
-            }
-            return "Lỗi: " + response.code();
-        } catch (Exception e) { return "Lỗi không xác định"; }
-    }
 }

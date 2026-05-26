@@ -95,8 +95,6 @@
                     android:orientation="horizontal"
                     android:gravity="center_vertical"
                     android:paddingHorizontal="20dp">
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                        android:text="👤" android:textSize="20sp" android:layout_marginEnd="16dp"/>
                     <TextView android:layout_width="0dp" android:layout_height="wrap_content"
                         android:layout_weight="1" android:text="Chỉnh sửa hồ sơ"
                         android:textColor="@color/text_dark" android:textSize="15sp"/>
@@ -118,8 +116,6 @@
                     android:orientation="horizontal"
                     android:gravity="center_vertical"
                     android:paddingHorizontal="20dp">
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                        android:text="🔑" android:textSize="20sp" android:layout_marginEnd="16dp"/>
                     <TextView android:layout_width="0dp" android:layout_height="wrap_content"
                         android:layout_weight="1" android:text="Đổi mật khẩu"
                         android:textColor="@color/text_dark" android:textSize="15sp"/>
@@ -141,8 +137,6 @@
                     android:orientation="horizontal"
                     android:gravity="center_vertical"
                     android:paddingHorizontal="20dp">
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                        android:text="🏦" android:textSize="20sp" android:layout_marginEnd="16dp"/>
                     <TextView android:layout_width="0dp" android:layout_height="wrap_content"
                         android:layout_weight="1" android:text="Thông tin ngân hàng"
                         android:textColor="@color/text_dark" android:textSize="15sp"/>
@@ -164,8 +158,6 @@
                     android:orientation="horizontal"
                     android:gravity="center_vertical"
                     android:paddingHorizontal="20dp">
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                        android:text="ℹ️" android:textSize="20sp" android:layout_marginEnd="16dp"/>
                     <TextView android:layout_width="0dp" android:layout_height="wrap_content"
                         android:layout_weight="1" android:text="Về ứng dụng"
                         android:textColor="@color/text_dark" android:textSize="15sp"/>
