@@ -74,6 +74,15 @@ public class ProfileActivity extends AppCompatActivity {
                 }
             });
 
+    private final ActivityResultLauncher<String> requestCameraPermission =
+            registerForActivityResult(new ActivityResultContracts.RequestPermission(), granted -> {
+                if (granted) {
+                    startCameraCapture();
+                } else {
+                    Toast.makeText(this, "Cần quyền Camera để chụp ảnh", Toast.LENGTH_SHORT).show();
+                }
+            });
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -120,8 +129,12 @@ public class ProfileActivity extends AppCompatActivity {
         binding.btnShowQr.setOnClickListener(v -> openQrScreen());
         binding.btnLogout.setOnClickListener(v -> showLogoutConfirm());
         // Click vào avatar hoặc nút camera → chọn ảnh hoặc chụp ảnh mới
-        binding.btnEditAvatar.setOnClickListener(v -> showImageSourceOptions(v));
-        binding.cardAvatar.setOnClickListener(v -> showImageSourceOptions(v));
+        android.view.View.OnClickListener pickPhotoMain = v -> {
+            Toast.makeText(ProfileActivity.this, "Đã chạm nút chọn ảnh!", Toast.LENGTH_SHORT).show();
+            showImageSourceOptions(v);
+        };
+        binding.btnEditAvatar.setOnClickListener(pickPhotoMain);
+        binding.cardAvatar.setOnClickListener(pickPhotoMain);
     }
 
     private void observeData() {
@@ -151,7 +164,7 @@ public class ProfileActivity extends AppCompatActivity {
         binding.ivAvatar.setVisibility(View.VISIBLE);
         binding.tvAvatarInitial.setVisibility(View.GONE);
         Glide.with(this)
-                .load(url)
+                .load(com.example.btck.utils.ImageUtils.getFullImageUrl(url))
                 .diskCacheStrategy(DiskCacheStrategy.NONE)
                 .skipMemoryCache(true)
                 .circleCrop()
@@ -200,12 +213,12 @@ public class ProfileActivity extends AppCompatActivity {
                                 currentUser = response.body();
                                 runOnUiThread(() -> {
                                     Toast.makeText(ProfileActivity.this,
-                                            "✅ Cập nhật ảnh đại diện thành công!", Toast.LENGTH_SHORT).show();
+                                            "Cập nhật ảnh đại diện thành công!", Toast.LENGTH_SHORT).show();
                                     if (currentUser.avatarUrl != null) {
                                         showAvatarImage(currentUser.avatarUrl);
                                         if (activeDialogAvatar != null && activeDialogAvatarInitial != null) {
                                             Glide.with(ProfileActivity.this)
-                                                    .load(currentUser.avatarUrl)
+                                                    .load(com.example.btck.utils.ImageUtils.getFullImageUrl(currentUser.avatarUrl))
                                                     .diskCacheStrategy(DiskCacheStrategy.NONE)
                                                     .skipMemoryCache(true)
                                                     .circleCrop()
@@ -224,7 +237,7 @@ public class ProfileActivity extends AppCompatActivity {
                         public void onFailure(@NonNull Call<UserPublic> call, @NonNull Throwable t) {
                             runOnUiThread(() ->
                                     Toast.makeText(ProfileActivity.this,
-                                            "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show());
+                                            "Không kết nối được máy chủ", Toast.LENGTH_SHORT).show());
                         }
                     });
 
@@ -233,24 +246,25 @@ public class ProfileActivity extends AppCompatActivity {
         }
     }
 
-    // Hiển thị lựa chọn nguồn ảnh: Camera hoặc Thư viện dưới dạng PopupMenu tại vị trí vừa nhấn
+    // Hiển thị lựa chọn nguồn ảnh: Camera hoặc Thư viện dưới dạng Dialog
     private void showImageSourceOptions(View anchorView) {
-        android.widget.PopupMenu popup = new android.widget.PopupMenu(this, anchorView);
-        popup.getMenu().add(0, 1, 0, "📸 Chụp ảnh mới");
-        popup.getMenu().add(0, 2, 0, "🖼️ Chọn từ thư viện");
-
-        popup.setOnMenuItemClickListener(item -> {
-            if (item.getItemId() == 1) {
-                startCameraCapture();
-                return true;
-            } else if (item.getItemId() == 2) {
-                Toast.makeText(this, "Đang mở thư viện ảnh...", Toast.LENGTH_SHORT).show();
-                pickImageLauncher.launch("image/*");
-                return true;
-            }
-            return false;
-        });
-        popup.show();
+        new com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
+                .setTitle("Chọn nguồn ảnh đại diện")
+                .setItems(new String[]{"Dùng Camera", "Chọn từ Thư viện"}, (dialog, which) -> {
+                    if (which == 0) {
+                        // Camera
+                        if (androidx.core.content.ContextCompat.checkSelfPermission(this, android.Manifest.permission.CAMERA)
+                                == android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                            startCameraCapture();
+                        } else {
+                            requestCameraPermission.launch(android.Manifest.permission.CAMERA);
+                        }
+                    } else {
+                        // Gallery
+                        pickImageLauncher.launch("image/*");
+                    }
+                })
+                .show();
     }
 
     // Khởi chạy camera để chụp hình
@@ -309,7 +323,7 @@ public class ProfileActivity extends AppCompatActivity {
             if (currentUser.avatarUrl != null && !currentUser.avatarUrl.isEmpty()) {
                 ivDialogAvatar.setVisibility(View.VISIBLE);
                 tvDialogInitial.setVisibility(View.GONE);
-                Glide.with(this).load(currentUser.avatarUrl).circleCrop().into(ivDialogAvatar);
+                Glide.with(this).load(com.example.btck.utils.ImageUtils.getFullImageUrl(currentUser.avatarUrl)).circleCrop().into(ivDialogAvatar);
             } else if (currentUser.getDisplayName() != null) {
                 tvDialogInitial.setText(
                         String.valueOf(currentUser.getDisplayName().charAt(0)).toUpperCase());
@@ -317,7 +331,10 @@ public class ProfileActivity extends AppCompatActivity {
         }
 
         // Click avatar hoặc camera trong dialog → mở menu chọn nguồn ảnh (Camera hoặc Thư viện)
-        android.view.View.OnClickListener pickPhoto = v -> showImageSourceOptions(v);
+        android.view.View.OnClickListener pickPhoto = v -> {
+            Toast.makeText(ProfileActivity.this, "Đã chạm nút chọn ảnh!", Toast.LENGTH_SHORT).show();
+            showImageSourceOptions(v);
+        };
         btnDialogCamera.setOnClickListener(pickPhoto);
         cardDialogAvatar.setOnClickListener(pickPhoto);
 
@@ -435,7 +452,7 @@ public class ProfileActivity extends AppCompatActivity {
         }
 
         new MaterialAlertDialogBuilder(this)
-                .setTitle("🏦 Thông tin ngân hàng")
+                .setTitle("Thông tin ngân hàng")
                 .setView(dialogView)
                 .setPositiveButton("Lưu", (dialog, which) -> {
                     String bankCode = "";
@@ -465,7 +482,7 @@ public class ProfileActivity extends AppCompatActivity {
                             currentUser = user;
                             runOnUiThread(() ->
                                     Toast.makeText(ProfileActivity.this,
-                                            "✅ Đã lưu thông tin ngân hàng!", Toast.LENGTH_SHORT).show());
+                                            "Đã lưu thông tin ngân hàng!", Toast.LENGTH_SHORT).show());
                         }
                         @Override
                         public void onError(String message) {
@@ -480,12 +497,7 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     private void populateBankDropdown(AutoCompleteTextView spinner) {
-        List<String> names = new ArrayList<>();
-        for (BankInfo b : bankList) {
-            names.add(b.getDisplayName() + " (" + b.bin + ")");
-        }
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(
-                this, android.R.layout.simple_dropdown_item_1line, names);
+        BankAdapter adapter = new BankAdapter(this, android.R.layout.simple_dropdown_item_1line, bankList);
         spinner.setAdapter(adapter);
 
         spinner.setOnItemClickListener((parent, view, position, id) -> {
@@ -497,6 +509,89 @@ public class ProfileActivity extends AppCompatActivity {
                 }
             }
         });
+
+        spinner.setOnClickListener(v -> spinner.showDropDown());
+        spinner.setOnFocusChangeListener((v, hasFocus) -> {
+            if (hasFocus) {
+                spinner.showDropDown();
+            }
+        });
+    }
+
+    private static class BankAdapter extends ArrayAdapter<String> {
+        private final List<BankInfo> banks;
+        private final List<String> allItems;
+        private final android.widget.Filter customFilter = new android.widget.Filter() {
+            @Override
+            protected android.widget.Filter.FilterResults performFiltering(CharSequence constraint) {
+                android.widget.Filter.FilterResults results = new android.widget.Filter.FilterResults();
+                if (constraint == null || constraint.length() == 0) {
+                    results.values = allItems;
+                    results.count = allItems.size();
+                } else {
+                    String query = removeAccent(constraint.toString().toLowerCase().trim());
+                    List<String> matches = new ArrayList<>();
+                    for (BankInfo b : banks) {
+                        String normalizedDisplayName = removeAccent(b.getDisplayName().toLowerCase());
+                        String normalizedName = b.name != null ? removeAccent(b.name.toLowerCase()) : "";
+                        String normalizedShortName = b.shortName != null ? removeAccent(b.shortName.toLowerCase()) : "";
+                        String normalizedCode = b.code != null ? removeAccent(b.code.toLowerCase()) : "";
+                        String normalizedBin = b.bin != null ? b.bin.toLowerCase() : "";
+
+                        if (normalizedDisplayName.contains(query)
+                                || normalizedName.contains(query)
+                                || normalizedShortName.contains(query)
+                                || normalizedCode.contains(query)
+                                || normalizedBin.contains(query)) {
+                            matches.add(b.getDisplayName() + " (" + b.bin + ")");
+                        }
+                    }
+                    results.values = matches;
+                    results.count = matches.size();
+                }
+                return results;
+            }
+
+            @SuppressWarnings("unchecked")
+            @Override
+            protected void publishResults(CharSequence constraint, android.widget.Filter.FilterResults results) {
+                clear();
+                if (results != null && results.values != null) {
+                    addAll((List<String>) results.values);
+                }
+                notifyDataSetChanged();
+            }
+
+            @Override
+            public CharSequence convertResultToString(Object resultValue) {
+                return (CharSequence) resultValue;
+            }
+        };
+
+        private static String removeAccent(String s) {
+            if (s == null) return "";
+            String temp = java.text.Normalizer.normalize(s, java.text.Normalizer.Form.NFD);
+            java.util.regex.Pattern pattern = java.util.regex.Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
+            return pattern.matcher(temp).replaceAll("")
+                    .replace('đ', 'd')
+                    .replace('Đ', 'D');
+        }
+
+        public BankAdapter(android.content.Context context, int resource, List<BankInfo> banks) {
+            super(context, resource, new ArrayList<>());
+            this.banks = banks;
+            this.allItems = new ArrayList<>();
+            for (BankInfo b : banks) {
+                this.allItems.add(b.getDisplayName() + " (" + b.bin + ")");
+            }
+            addAll(allItems);
+        }
+
+        @NonNull
+        @Override
+        public android.widget.Filter getFilter() {
+            return customFilter;
+        }
     }
 
     // ── Show QR ─────────────────────────────────────────────────────────────────

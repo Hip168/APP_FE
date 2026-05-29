@@ -129,7 +129,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                     }
                     @Override
                     public void onFailure(@NonNull Call<MessageResponse> call, @NonNull Throwable t) {
-                        Log.e(TAG, "Lỗi gửi FCM token: " + t.getMessage());
+                        Log.e(TAG, "Không kết nối được máy chủ");
                     }
                 });
     }

@@ -57,7 +57,9 @@ public class AddExpenseActivity extends AppCompatActivity {
                 if (success && photoFile != null) {
                     binding.ivReceiptPreview.setImageURI(photoUri);
                     binding.ivReceiptPreview.setVisibility(View.VISIBLE);
-                    Toast.makeText(this, "✅ Đã chụp ảnh hoá đơn", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Đã chụp ảnh hoá đơn", Toast.LENGTH_SHORT).show();
+                    // Đã tắt tự động quét OCR điền thông tin hóa đơn
+                    // runOCR(photoUri);
                 }
             });
 
@@ -68,6 +70,8 @@ public class AddExpenseActivity extends AppCompatActivity {
                     photoFile = null; // gallery file handled differently
                     binding.ivReceiptPreview.setImageURI(uri);
                     binding.ivReceiptPreview.setVisibility(View.VISIBLE);
+                    // Đã tắt tự động quét OCR điền thông tin hóa đơn
+                    // runOCR(uri);
                 }
             });
 
@@ -156,6 +160,7 @@ public class AddExpenseActivity extends AppCompatActivity {
             recalculateSplits();
         });
 
+        binding.etAmount.addTextChangedListener(new com.example.btck.utils.CurrencyTextWatcher(binding.etAmount));
         binding.etAmount.addTextChangedListener(new TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
             @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
@@ -234,7 +239,7 @@ public class AddExpenseActivity extends AppCompatActivity {
 
     private void showImageOptions() {
         new com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
-                .setTitle("📷 Chụp ảnh hoá đơn")
+                .setTitle("Chụp ảnh hoá đơn")
                 .setItems(new String[]{"Dùng Camera", "Chọn từ Thư viện"}, (dialog, which) -> {
                     if (which == 0) {
                         // Camera
@@ -267,6 +272,124 @@ public class AddExpenseActivity extends AppCompatActivity {
             cameraLauncher.launch(photoUri);
         } catch (IOException e) {
             Toast.makeText(this, "Không tạo được file ảnh", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void runOCR(Uri uri) {
+        if (uri == null) return;
+        Toast.makeText(this, "🔍 Đang phân tích hoá đơn...", Toast.LENGTH_SHORT).show();
+        try {
+            com.google.mlkit.vision.common.InputImage image =
+                    com.google.mlkit.vision.common.InputImage.fromFilePath(this, uri);
+            com.google.mlkit.vision.text.TextRecognizer recognizer =
+                    com.google.mlkit.vision.text.TextRecognition.getClient(
+                            com.google.mlkit.vision.text.latin.TextRecognizerOptions.DEFAULT_OPTIONS);
+
+            recognizer.process(image)
+                    .addOnSuccessListener(visionText -> {
+                        String text = visionText.getText();
+                        parseReceiptText(text);
+                    })
+                    .addOnFailureListener(e -> {
+                        Toast.makeText(this, "Không thể đọc hoá đơn: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    });
+        } catch (Exception e) {
+            Toast.makeText(this, "Lỗi đọc tệp ảnh: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void parseReceiptText(String text) {
+        if (TextUtils.isEmpty(text)) return;
+
+        String[] lines = text.split("\n");
+        long detectedAmount = 0;
+        String detectedDescription = "";
+
+        List<String> totalKeywords = Arrays.asList(
+            "tong cong", "tổng cộng", "thành tiền", "thanh tien",
+            "thanh toán", "thanh toan", "tổng tiền", "tong tien",
+            "total", "grand total", "net amount", "cộng", "cong"
+        );
+
+        List<Long> numbers = new ArrayList<>();
+        java.util.regex.Pattern numberPattern = java.util.regex.Pattern.compile("\\b\\d{1,3}([.,]\\d{3})+\\b|\\b\\d{4,9}\\b");
+
+        for (String line : lines) {
+            String lowerLine = line.toLowerCase();
+
+            if (TextUtils.isEmpty(detectedDescription)) {
+                String trimmed = line.trim();
+                if (trimmed.length() > 3 && !trimmed.matches(".*\\d{5,}.*") && !trimmed.contains("/") && !trimmed.contains(":")) {
+                    detectedDescription = trimmed;
+                }
+            }
+
+            boolean hasTotalKeyword = false;
+            for (String kw : totalKeywords) {
+                if (lowerLine.contains(kw)) {
+                    hasTotalKeyword = true;
+                    break;
+                }
+            }
+
+            if (hasTotalKeyword) {
+                java.util.regex.Matcher m = numberPattern.matcher(line);
+                long largestInLine = 0;
+                while (m.find()) {
+                    try {
+                        String numStr = m.group().replaceAll("[.,]", "");
+                        long val = Long.parseLong(numStr);
+                        if (val >= 1000 && val <= 50000000) {
+                            if (val > largestInLine) {
+                                largestInLine = val;
+                            }
+                        }
+                    } catch (NumberFormatException e) {
+                        // Ignore
+                    }
+                }
+                if (largestInLine > 0) {
+                    detectedAmount = largestInLine;
+                    break;
+                }
+            }
+
+            java.util.regex.Matcher m = numberPattern.matcher(line);
+            while (m.find()) {
+                try {
+                    String numStr = m.group().replaceAll("[.,]", "");
+                    long val = Long.parseLong(numStr);
+                    if (val >= 1000 && val <= 50000000) {
+                        numbers.add(val);
+                    }
+                } catch (NumberFormatException e) {
+                    // Ignore
+                }
+            }
+        }
+
+        if (detectedAmount == 0 && !numbers.isEmpty()) {
+            long max = 0;
+            for (long n : numbers) {
+                if (n > max) max = n;
+            }
+            detectedAmount = max;
+        }
+
+        if (TextUtils.isEmpty(detectedDescription) && lines.length > 0) {
+            detectedDescription = lines[0].trim();
+        }
+
+        if (detectedDescription.length() > 50) {
+            detectedDescription = detectedDescription.substring(0, 47) + "...";
+        }
+
+        if (detectedAmount > 0) {
+            binding.etAmount.setText(String.valueOf(detectedAmount));
+            Toast.makeText(this, "🔍 Đã quét được số tiền: " + String.format(Locale.getDefault(), "%,dđ", detectedAmount), Toast.LENGTH_LONG).show();
+        }
+        if (!TextUtils.isEmpty(detectedDescription)) {
+            binding.etDescription.setText(detectedDescription);
         }
     }
 

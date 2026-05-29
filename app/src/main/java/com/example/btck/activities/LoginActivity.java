@@ -5,6 +5,8 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Toast;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 import com.example.btck.R;
@@ -15,6 +17,16 @@ public class LoginActivity extends AppCompatActivity {
 
     private ActivityLoginBinding binding;
     private AuthViewModel viewModel;
+
+    private final ActivityResultLauncher<Intent> registerLauncher =
+            registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+                if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+                    String email = result.getData().getStringExtra("email");
+                    String password = result.getData().getStringExtra("password");
+                    if (email != null) binding.etEmail.setText(email);
+                    if (password != null) binding.etPassword.setText(password);
+                }
+            });
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,24 +75,36 @@ public class LoginActivity extends AppCompatActivity {
             String email = binding.etEmail.getText().toString().trim();
             String password = binding.etPassword.getText().toString().trim();
 
+            binding.tilEmail.setError(null);
+            binding.tilPassword.setError(null);
+
             if (TextUtils.isEmpty(email)) {
                 binding.tilEmail.setError("Vui lòng nhập email");
+                return;
+            }
+            if (email.contains(" ")) {
+                binding.tilEmail.setError("Email không được chứa khoảng trắng");
+                return;
+            }
+            if (!email.contains("@")) {
+                binding.tilEmail.setError("Email thiếu ký tự @");
+                return;
+            }
+            if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                binding.tilEmail.setError("Email không đúng định dạng (VD: example@email.com)");
                 return;
             }
             if (TextUtils.isEmpty(password)) {
                 binding.tilPassword.setError("Vui lòng nhập mật khẩu");
                 return;
             }
-            binding.tilEmail.setError(null);
-            binding.tilPassword.setError(null);
             viewModel.login(email, password);
         });
 
-        binding.tvForgotPassword.setOnClickListener(v ->
-                startActivity(new Intent(this, ForgotPasswordActivity.class)));
 
         binding.tvRegister.setOnClickListener(v -> {
-            startActivity(new Intent(this, RegisterActivity.class));
+            Intent intent = new Intent(this, RegisterActivity.class);
+            registerLauncher.launch(intent);
             overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right);
         });
     }

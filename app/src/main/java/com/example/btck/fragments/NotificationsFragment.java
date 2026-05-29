@@ -14,6 +14,7 @@ import com.example.btck.R;
 import com.example.btck.activities.ExpenseDetailActivity;
 import com.example.btck.activities.GroupDetailActivity;
 import com.example.btck.activities.SettlementActivity;
+import com.example.btck.activities.MainActivity;
 import com.example.btck.adapters.NotificationAdapter;
 import com.example.btck.api.ApiService;
 import com.example.btck.api.RetrofitClient;
@@ -77,6 +78,11 @@ public class NotificationsFragment extends Fragment {
                     boolean empty = notifList.isEmpty();
                     binding.layoutEmpty.setVisibility(empty ? View.VISIBLE : View.GONE);
                     binding.rvNotifications.setVisibility(empty ? View.GONE : View.VISIBLE);
+
+                    // Cập nhật badge ở MainActivity
+                    if (requireActivity() instanceof MainActivity) {
+                        ((MainActivity) requireActivity()).updateNotificationBadge();
+                    }
                 }
             }
             @Override
@@ -92,6 +98,10 @@ public class NotificationsFragment extends Fragment {
             @Override public void onResponse(Call<NotificationPublic> call, Response<NotificationPublic> response) {
                 notif.isRead = true;
                 adapter.notifyDataSetChanged();
+                // Cập nhật badge ở MainActivity
+                if (isAdded() && getActivity() instanceof MainActivity) {
+                    ((MainActivity) getActivity()).updateNotificationBadge();
+                }
             }
             @Override public void onFailure(Call<NotificationPublic> call, Throwable t) {}
         });
@@ -137,6 +147,10 @@ public class NotificationsFragment extends Fragment {
                     adapter.notifyDataSetChanged();
                     binding.tvUnreadCount.setText("0 chưa đọc");
                     Toast.makeText(requireContext(), "Đã đọc tất cả", Toast.LENGTH_SHORT).show();
+                    // Cập nhật badge ở MainActivity
+                    if (getActivity() instanceof MainActivity) {
+                        ((MainActivity) getActivity()).updateNotificationBadge();
+                    }
                 }
             }
             @Override public void onFailure(Call<com.example.btck.models.MessageResponse> call, Throwable t) {}

@@ -63,7 +63,7 @@
                         android:id="@+id/tvGreeting"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Chào buổi sáng,"
+                        android:text="Xin chào,"
                         android:textColor="@color/text_secondary"
                         android:textSize="14sp" />
                     <TextView

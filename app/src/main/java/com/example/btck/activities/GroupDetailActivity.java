@@ -65,6 +65,13 @@ public class GroupDetailActivity extends AppCompatActivity {
         setupToolbar();
         setupRecyclerView();
         setupTabs();
+        int targetTab = getIntent().getIntExtra("target_tab", 0);
+        if (targetTab > 0 && targetTab < binding.tabLayout.getTabCount()) {
+            com.google.android.material.tabs.TabLayout.Tab tab = binding.tabLayout.getTabAt(targetTab);
+            if (tab != null) {
+                tab.select();
+            }
+        }
         observeData();
         loadData();
     }
@@ -354,7 +361,16 @@ public class GroupDetailActivity extends AppCompatActivity {
     private void renderSimplifiedDebts(List<SimplifiedDebt> debts) {
         binding.layoutSimplifiedContent.removeAllViews();
 
-        if (debts.isEmpty()) {
+        List<SimplifiedDebt> filteredDebts = new ArrayList<>();
+        if (debts != null) {
+            for (SimplifiedDebt debt : debts) {
+                if (currentUserId != null && (currentUserId.equals(debt.fromUserId) || currentUserId.equals(debt.toUserId))) {
+                    filteredDebts.add(debt);
+                }
+            }
+        }
+
+        if (filteredDebts.isEmpty()) {
             showSettledState();
             return;
         }
@@ -367,7 +383,7 @@ public class GroupDetailActivity extends AppCompatActivity {
         title.setPadding(0, 0, 0, dp(12));
         binding.layoutSimplifiedContent.addView(title);
 
-        for (SimplifiedDebt debt : debts) {
+        for (SimplifiedDebt debt : filteredDebts) {
             binding.layoutSimplifiedContent.addView(createDebtCard(debt));
         }
     }
@@ -516,6 +532,19 @@ public class GroupDetailActivity extends AppCompatActivity {
         intent.putExtra("user_id", debt.toUserId);
         intent.putExtra("amount", debt.amount);
         intent.putExtra("description", "Thanh toan " + eventName);
+
+        // Retrieve and pass recipient's bank details from eventBalances
+        if (eventViewModel.eventBalances.getValue() != null && eventViewModel.eventBalances.getValue().balances != null) {
+            for (UserBalance balance : eventViewModel.eventBalances.getValue().balances) {
+                if (balance.userId != null && balance.userId.equals(debt.toUserId)) {
+                    intent.putExtra("bank_name", balance.bankName);
+                    intent.putExtra("account_number", balance.accountNumber);
+                    intent.putExtra("account_holder", balance.accountHolder);
+                    break;
+                }
+            }
+        }
+
         startActivity(intent);
     }
 

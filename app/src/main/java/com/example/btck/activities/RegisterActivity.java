@@ -31,6 +31,14 @@ public class RegisterActivity extends AppCompatActivity {
         viewModel.registerResult.observe(this, user -> {
             if (user != null) {
                 Toast.makeText(this, "Đăng ký thành công! Vui lòng đăng nhập.", Toast.LENGTH_SHORT).show();
+                
+                String email = binding.etEmail.getText() != null ? binding.etEmail.getText().toString().trim() : "";
+                String password = binding.etPassword.getText() != null ? binding.etPassword.getText().toString().trim() : "";
+                Intent data = new Intent();
+                data.putExtra("email", email);
+                data.putExtra("password", password);
+                setResult(RESULT_OK, data);
+
                 finish();
             }
         });
@@ -58,15 +66,19 @@ public class RegisterActivity extends AppCompatActivity {
             String password = binding.etPassword.getText().toString().trim();
             String confirmPwd = binding.etConfirmPassword.getText().toString().trim();
 
-            if (TextUtils.isEmpty(fullName)) { binding.tilFullName.setError("Vui lòng nhập họ tên"); return; }
-            if (TextUtils.isEmpty(email)) { binding.tilEmail.setError("Vui lòng nhập email"); return; }
-            if (password.length() < 8) { binding.tilPassword.setError("Mật khẩu tối thiểu 8 ký tự"); return; }
-            if (!password.equals(confirmPwd)) { binding.tilConfirmPassword.setError("Mật khẩu không khớp"); return; }
-
             binding.tilFullName.setError(null);
             binding.tilEmail.setError(null);
             binding.tilPassword.setError(null);
             binding.tilConfirmPassword.setError(null);
+
+            if (TextUtils.isEmpty(fullName)) { binding.tilFullName.setError("Vui lòng nhập họ tên"); return; }
+            if (TextUtils.isEmpty(email)) { binding.tilEmail.setError("Vui lòng nhập email"); return; }
+            if (email.contains(" ")) { binding.tilEmail.setError("Email không được chứa khoảng trắng"); return; }
+            if (!email.contains("@")) { binding.tilEmail.setError("Email thiếu ký tự @"); return; }
+            if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) { binding.tilEmail.setError("Email không đúng định dạng (VD: example@email.com)"); return; }
+            if (password.length() < 8) { binding.tilPassword.setError("Mật khẩu tối thiểu 8 ký tự"); return; }
+            if (!password.equals(confirmPwd)) { binding.tilConfirmPassword.setError("Mật khẩu không khớp"); return; }
+
             viewModel.register(email, password, fullName);
         });
 

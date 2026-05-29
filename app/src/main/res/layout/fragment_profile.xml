@@ -19,21 +19,36 @@
             android:gravity="center"
             android:orientation="vertical">
 
-            <LinearLayout
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="80dp"
                 android:layout_height="80dp"
-                android:background="@drawable/bg_avatar_circle"
-                android:gravity="center">
-                <TextView
-                    android:id="@+id/tvAvatarInitial"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="?"
-                    android:textColor="@color/text_dark"
-                    android:textSize="32sp"
-                    android:textStyle="bold"
-                    android:fontFamily="@font/inter_bold"/>
-            </LinearLayout>
+                app:cardCornerRadius="40dp"
+                app:cardBackgroundColor="#E8F5E9"
+                app:cardElevation="0dp">
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <TextView
+                        android:id="@+id/tvAvatarInitial"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:text="?"
+                        android:textColor="@color/mint_dark"
+                        android:textSize="32sp"
+                        android:textStyle="bold"
+                        android:gravity="center"
+                        android:fontFamily="@font/inter_bold"/>
+
+                    <ImageView
+                        android:id="@+id/ivAvatar"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scaleType="centerCrop"
+                        android:visibility="gone"/>
+                </FrameLayout>
+            </com.google.android.material.card.MaterialCardView>
 
             <TextView
                 android:id="@+id/tvUserName"
@@ -80,8 +95,6 @@
                     android:orientation="horizontal"
                     android:gravity="center_vertical"
                     android:paddingHorizontal="20dp">
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                        android:text="👤" android:textSize="20sp" android:layout_marginEnd="16dp"/>
                     <TextView android:layout_width="0dp" android:layout_height="wrap_content"
                         android:layout_weight="1" android:text="Chỉnh sửa hồ sơ"
                         android:textColor="@color/text_dark" android:textSize="15sp"/>
@@ -103,8 +116,6 @@
                     android:orientation="horizontal"
                     android:gravity="center_vertical"
                     android:paddingHorizontal="20dp">
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                        android:text="🔑" android:textSize="20sp" android:layout_marginEnd="16dp"/>
                     <TextView android:layout_width="0dp" android:layout_height="wrap_content"
                         android:layout_weight="1" android:text="Đổi mật khẩu"
                         android:textColor="@color/text_dark" android:textSize="15sp"/>
@@ -126,8 +137,6 @@
                     android:orientation="horizontal"
                     android:gravity="center_vertical"
                     android:paddingHorizontal="20dp">
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                        android:text="🏦" android:textSize="20sp" android:layout_marginEnd="16dp"/>
                     <TextView android:layout_width="0dp" android:layout_height="wrap_content"
                         android:layout_weight="1" android:text="Thông tin ngân hàng"
                         android:textColor="@color/text_dark" android:textSize="15sp"/>
@@ -149,8 +158,6 @@
                     android:orientation="horizontal"
                     android:gravity="center_vertical"
                     android:paddingHorizontal="20dp">
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                        android:text="ℹ️" android:textSize="20sp" android:layout_marginEnd="16dp"/>
                     <TextView android:layout_width="0dp" android:layout_height="wrap_content"
                         android:layout_weight="1" android:text="Về ứng dụng"
                         android:textColor="@color/text_dark" android:textSize="15sp"/>
