@@ -58,7 +58,8 @@ public class AddExpenseActivity extends AppCompatActivity {
                     binding.ivReceiptPreview.setImageURI(photoUri);
                     binding.ivReceiptPreview.setVisibility(View.VISIBLE);
                     Toast.makeText(this, "Đã chụp ảnh hoá đơn", Toast.LENGTH_SHORT).show();
-                    runOCR(photoUri);
+                    // Đã tắt tự động quét OCR điền thông tin hóa đơn
+                    // runOCR(photoUri);
                 }
             });
 
@@ -69,7 +70,8 @@ public class AddExpenseActivity extends AppCompatActivity {
                     photoFile = null; // gallery file handled differently
                     binding.ivReceiptPreview.setImageURI(uri);
                     binding.ivReceiptPreview.setVisibility(View.VISIBLE);
-                    runOCR(uri);
+                    // Đã tắt tự động quét OCR điền thông tin hóa đơn
+                    // runOCR(uri);
                 }
             });
 
