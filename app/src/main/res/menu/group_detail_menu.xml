@@ -17,12 +17,4 @@
         android:id="@+id/action_settle"
         android:title="Ghi nhận thanh toán"
         app:showAsAction="never" />
-    <item
-        android:id="@+id/action_info"
-        android:title="Thông tin nhóm"
-        app:showAsAction="never" />
-    <item
-        android:id="@+id/action_leave"
-        android:title="Rời nhóm"
-        app:showAsAction="never" />
 </menu>

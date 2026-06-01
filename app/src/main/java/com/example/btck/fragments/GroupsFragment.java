@@ -120,6 +120,15 @@ public class GroupsFragment extends Fragment {
     private void setupClickListeners() {
         binding.fabCreateGroup.setOnClickListener(v -> showCreateGroupDialog());
         binding.btnJoinGroup.setOnClickListener(v -> showJoinGroupDialog());
+
+        binding.etSearch.addTextChangedListener(new android.text.TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
+            @Override public void afterTextChanged(android.text.Editable s) {
+                String query = s.toString().trim();
+                viewModel.loadEvents(query.isEmpty() ? null : query);
+            }
+        });
     }
 
     private void showCreateGroupDialog() {
@@ -163,7 +172,8 @@ public class GroupsFragment extends Fragment {
     }
 
     private void loadData() {
-        viewModel.loadEvents();
+        String query = binding.etSearch.getText().toString().trim();
+        viewModel.loadEvents(query.isEmpty() ? null : query);
     }
 
     private void loadBalanceHints(List<EventPublic> events) {

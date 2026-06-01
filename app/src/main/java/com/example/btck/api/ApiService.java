@@ -78,7 +78,8 @@ public interface ApiService {
     @GET("events/")
     Call<EventsPublic> getEvents(
             @Query("skip") int skip,
-            @Query("limit") int limit
+            @Query("limit") int limit,
+            @Query("q") String query
     );
 
     @POST("events/")
