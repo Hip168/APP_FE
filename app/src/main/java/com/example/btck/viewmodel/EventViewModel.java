@@ -23,16 +23,21 @@ public class EventViewModel extends AndroidViewModel {
     public final MutableLiveData<Boolean> deleteResult = new MutableLiveData<>();
     public final MutableLiveData<String> errorMessage = new MutableLiveData<>();
     public final MutableLiveData<Boolean> isLoading = new MutableLiveData<>(false);
+    public final MutableLiveData<Boolean> memberKicked = new MutableLiveData<>();
 
     public EventViewModel(Application application) {
         super(application);
         repository = new EventRepository();
     }
 
-    public void loadEvents() {
+    public void loadEvents(String query) {
         isLoading.setValue(true);
-        repository.getEvents(0, 100, events, errorMessage);
+        repository.getEvents(0, 100, query, events, errorMessage);
         // isLoading sẽ được reset ở observer trong Activity/Fragment
+    }
+
+    public void loadEvents() {
+        loadEvents(null);
     }
 
     public void createEvent(String name, String description) {
@@ -74,5 +79,9 @@ public class EventViewModel extends AndroidViewModel {
 
     public void joinEvent(String code) {
         repository.joinEvent(code, joinResult, errorMessage);
+    }
+
+    public void removeMember(String eventId, String userId) {
+        repository.removeMember(eventId, userId, memberKicked, errorMessage);
     }
 }

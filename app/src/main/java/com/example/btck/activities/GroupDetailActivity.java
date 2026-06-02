@@ -42,6 +42,7 @@ public class GroupDetailActivity extends AppCompatActivity {
     private String eventId;
     private String eventName;
     private String currentUserId;
+    private com.example.btck.models.EventPublic currentEvent; // lưu lại thông tin nhóm hiện tại
     private boolean isFirstLoad = true; // tránh gọi loadData() 2 lần khi khởi tạo
     private int currentTab = 0;
     private final Set<String> pendingSettlementKeys = new HashSet<>();
@@ -155,6 +156,7 @@ public class GroupDetailActivity extends AppCompatActivity {
 
         eventViewModel.selectedEvent.observe(this, event -> {
             if (event != null) {
+                currentEvent = event;
                 binding.tvMemberCount.setText(event.memberCount + " thành viên");
                 binding.tvExpenseCount.setText(event.expenseCount + " chi tiêu");
                 binding.toolbar.setTitle(event.name);
@@ -263,6 +265,16 @@ public class GroupDetailActivity extends AppCompatActivity {
                 eventViewModel.inviteCode.setValue(null);
             }
         });
+
+        eventViewModel.memberKicked.observe(this, kicked -> {
+            if (kicked != null && kicked) {
+                Toast.makeText(this, "Đã xóa thành viên khỏi nhóm!", Toast.LENGTH_SHORT).show();
+                eventViewModel.memberKicked.setValue(null);
+                loadData();
+                if (currentTab == 1) eventViewModel.loadEventBalances(eventId);
+                if (currentTab == 2) eventViewModel.loadSimplifiedDebts(eventId);
+            }
+        });
     } // end observeData
 
     private void renderBalances(List<UserBalance> balances) {
@@ -348,6 +360,28 @@ public class GroupDetailActivity extends AppCompatActivity {
         amount.setTextSize(15);
         amount.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
         row.addView(amount);
+
+        // Hiển thị nút Xóa thành viên nếu người dùng hiện tại là người tạo nhóm
+        boolean isCreator = currentEvent != null && currentUserId != null && currentUserId.equals(currentEvent.createdById);
+        boolean isNotSelf = balance.userId != null && !balance.userId.equals(currentUserId);
+
+        if (isCreator && isNotSelf) {
+            TextView btnKick = new TextView(this);
+            btnKick.setText("Xóa");
+            btnKick.setTextColor(getColor(R.color.color_owe)); // màu đỏ
+            btnKick.setTextSize(14);
+            btnKick.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+            LinearLayout.LayoutParams kickParams = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+            );
+            kickParams.setMarginStart(dp(16));
+            btnKick.setLayoutParams(kickParams);
+            btnKick.setPadding(dp(8), dp(4), dp(8), dp(4));
+
+            btnKick.setOnClickListener(v -> handleKickMember(balance.userId, name, balance.netBalance));
+            row.addView(btnKick);
+        }
 
         return card;
     }
@@ -647,5 +681,24 @@ public class GroupDetailActivity extends AppCompatActivity {
                 })
                 .setNegativeButton("Hủy", null)
                 .show();
+    }
+
+    private void handleKickMember(String memberId, String memberName, long netBalance) {
+        if (netBalance != 0) {
+            new MaterialAlertDialogBuilder(this)
+                    .setTitle("Không thể xóa thành viên")
+                    .setMessage("Thành viên \"" + memberName + "\" chưa trả hết nợ, không thể xóa khỏi nhóm.")
+                    .setPositiveButton("Đồng ý", null)
+                    .show();
+        } else {
+            new MaterialAlertDialogBuilder(this)
+                    .setTitle("Xóa thành viên")
+                    .setMessage("Bạn có chắc chắn muốn xóa thành viên \"" + memberName + "\" ra khỏi nhóm?")
+                    .setPositiveButton("Xóa", (dialog, which) -> {
+                        eventViewModel.removeMember(eventId, memberId);
+                    })
+                    .setNegativeButton("Hủy", null)
+                    .show();
+        }
     }
 }

@@ -17,10 +17,10 @@ public class EventRepository {
         api = RetrofitClient.getApiService();
     }
 
-    public void getEvents(int skip, int limit,
+    public void getEvents(int skip, int limit, String query,
                           MutableLiveData<EventsPublic> onSuccess,
                           MutableLiveData<String> onError) {
-        api.getEvents(skip, limit).enqueue(new Callback<EventsPublic>() {
+        api.getEvents(skip, limit, query).enqueue(new Callback<EventsPublic>() {
             @Override
             public void onResponse(Call<EventsPublic> call, Response<EventsPublic> response) {
                 if (response.isSuccessful() && response.body() != null) onSuccess.postValue(response.body());
@@ -166,6 +166,20 @@ public class EventRepository {
             }
             @Override
             public void onFailure(Call<EventMemberPublic> call, Throwable t) { onError.postValue("Không kết nối được máy chủ"); }
+        });
+    }
+
+    public void removeMember(String eventId, String userId,
+                             MutableLiveData<Boolean> onSuccess,
+                             MutableLiveData<String> onError) {
+        api.removeMember(eventId, userId).enqueue(new Callback<MessageResponse>() {
+            @Override
+            public void onResponse(Call<MessageResponse> call, Response<MessageResponse> response) {
+                if (response.isSuccessful()) onSuccess.postValue(true);
+                else onError.postValue(ErrorUtils.parseError(response));
+            }
+            @Override
+            public void onFailure(Call<MessageResponse> call, Throwable t) { onError.postValue("Không kết nối được máy chủ"); }
         });
     }
 }
